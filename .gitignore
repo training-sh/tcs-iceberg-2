@@ -1,0 +1,34 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local Python environments
+.venv/
+venv/
+
+# Java build artifacts
+*.jar
+*.class
+*.war
+*.ear
+
+# Logs and temporary files
+*.log
+*.log.*
+logs/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
