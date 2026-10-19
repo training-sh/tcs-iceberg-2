@@ -2,6 +2,14 @@
 CRC not reflecting in the cloned machine
 
 ```
+cat <<'EOF' | tee -a ~/.bashrc
+
+# CRC / OpenShift
+export PATH="$HOME/.local/bin:$HOME/.crc/bin/oc:$PATH"
+EOF
+```
+
+```
 
 
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
