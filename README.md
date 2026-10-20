@@ -31,6 +31,8 @@ Continue with [01 - Getting started](01-GetStarted/README.md):
 3. [12 - Spark master](01-GetStarted/12-spark-master-openshift.md)
 4. [13 - Spark submit](01-GetStarted/13-spark-submit-openshift.md)
 5. [14 - Hive](01-GetStarted/14-hive-openshift.md)
+6. [15 - SeaweedFS S3](01-GetStarted/15-seaweedfs.md)
+7. [16 - Polaris and Iceberg](01-GetStarted/16-polaris.md)
 
 ## Reference presentation
 

@@ -1,6 +1,6 @@
 # OKD on CRC: installation and cluster operations
 
-This lab runs the community OKD distribution in a CodeReady Containers (CRC) virtual machine. Run selected shell blocks in a Bash terminal on the Linux VM. Complete the [three `.bashrc` additions](../00-bashrc.md) before running startup helpers; diagnostic and workload operations are separate examples, not a script to run from top to bottom. Commands that begin with `sudo` require the VM user's sudo access.
+This lab runs the community OKD distribution in a CodeReady Containers (CRC) virtual machine. **CRC installation and initial preparation are already complete on the supplied training VM. No installation is needed; the host requirements and installation instructions below are for information only.** The remaining setup is to complete the [three `.bashrc` additions and validations](../00-bashrc.md) before using the startup helpers. Run selected operational shell blocks in a Bash terminal on the Linux VM; diagnostic and workload operations are separate examples, not a script to run from top to bottom. Commands that begin with `sudo` require the VM user's sudo access.
 
 ## Software and data locations
 
@@ -41,7 +41,9 @@ getent group kvm
 
 ## Install and prepare CRC
 
-Install the host packages and CRC from this guide. Run these commands as the ordinary sudo-capable login user. The download is skipped when `$HOME/.local/bin/crc` already exists.
+**For information only: host packages, CRC installation, and initial configuration are already complete on the supplied training VM. Skip both setup blocks in this section and continue with [Configure `.bashrc`](#configure-bashrc).**
+
+The commands below document the original installation procedure. They run as the ordinary sudo-capable login user. The download is skipped when `$HOME/.local/bin/crc` already exists.
 
 ```bash
 sudo apt-get update

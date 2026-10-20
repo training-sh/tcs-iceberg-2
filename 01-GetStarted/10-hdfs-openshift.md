@@ -1,204 +1,385 @@
 # HDFS on OpenShift: first operations
 
-Run the lesson sections in order after the course workloads have been deployed. Startup, restart, scale, and data-writing blocks change the lab. The initialization block must succeed before you continue. Examples that print forwarding commands show what to run in a separate terminal; keep each forward running while using its URL.
+Run the lesson sections in order after the course workloads have been deployed. Startup, restart, scale, and data-writing blocks change the lab. The initialization block must succeed before you continue. Run UI forwarding commands in separate VM terminals and keep them running while using their URLs.
 
-Strict-mode command blocks use `( ... )` subshells so their `set -euo pipefail` settings do not change or close your interactive terminal. Variables inside one such block do not carry into the next.
+Run commands one at a time and check each result before continuing. Enter heredocs and commands continued with `\` as complete units. If a command fails, resolve the error before running the next command.
 
 **DO NOT DELETE lab resources or data.** Bash deletion examples are commented with `#`; SQL deletion examples use `--`. Keep those comments in place. Sample input commands using `-put -f` overwrite only the named lesson input files. MapReduce/Spark output directories must not already exist; for a repeat run, choose a fresh output path and update every occurrence in that lesson instead of deleting previous results.
 
-These are Bash commands for the Linux VM terminal, not Jupyter cells. Copy each block into the VM terminal; the in-cluster Jupyter container does not provide the `oc` administration client. Commands use the current OpenShift context and namespace `bigdata`.
+These are Bash commands for the Linux VM terminal, not Jupyter cells. Run the commands in the VM terminal; the in-cluster Jupyter container does not provide the `oc` administration client. Commands use the current OpenShift context and namespace `bigdata`.
 
 ## Initialize the VM terminal
 
-Open a terminal in the Linux VM. The one-time functions are installed by [00 - Installation](../00-Introduction/00-Installation.md). Load them, connect `oc` to the running CRC cluster, and select the `bigdata` project before continuing.
+Open a Bash terminal in the Linux VM after completing [Bash configuration](../00-bashrc.md). Run this once per terminal to load the cluster credentials and select `bigdata`. Continue only when it succeeds. If the cluster is stopped, run `okd-start`. If `okd-env` is not found, run `source ~/.bashrc` and retry.
 
 ```bash
-# Load the helpers into this terminal, then validate access.
-source "$HOME/.bashrc"
-if declare -F okd-env >/dev/null; then
-  okd-env && oc whoami && oc project && oc get nodes
-else
-  echo 'Complete 00-Introduction/00-Installation.md first.' >&2
-fi
+okd-env
 ```
 
 ## 1. Confirm the cluster and project
 
 `oc` is the OpenShift command-line client. A project is an OpenShift namespace.
 
+Show the OpenShift identity used by this terminal.
+
 ```bash
-(
-# 1. Confirm the cluster and project
-set -euo pipefail
 oc whoami
+```
+
+Show the current cluster context.
+
+```bash
 oc config current-context
+```
+
+Select the `bigdata` project for this terminal.
+
+```bash
 oc project bigdata
+```
+
+Inspect cluster node capacity and readiness. `-o wide` adds details such as node addresses.
+
+```bash
 oc get node -o wide
-)
 ```
 
 ## 2. Inspect HDFS resources
 
-HDFS uses one NameNode StatefulSet, one DataNode StatefulSet, two Services and persistent volume claims.
+HDFS uses one NameNode StatefulSet, one DataNode StatefulSet, two Services and persistent volume claims. First inspect the resource types, then inspect the containers inside each pod. `-n bigdata` selects the project; `-l` filters resources by label.
+
+Inspect StatefulSets, which manage the stable pod identities and persistent storage used by these services.
 
 ```bash
-(
-# 2. Inspect HDFS resources
-set -euo pipefail
-oc -n bigdata get statefulset,pod,service,pvc -l 'app in (namenode,datanode)' -o wide
-echo
-echo 'HDFS pods only:'
+oc -n bigdata get statefulset -l 'app in (namenode,datanode)' -o wide
+```
+
+List the matching pods and check their `READY` and `STATUS` columns.
+
+```bash
+oc -n bigdata get pod -l 'app in (namenode,datanode)' -o wide
+```
+
+Inspect Services, which give pods stable network names and ports.
+
+```bash
+oc -n bigdata get service -l 'app in (namenode,datanode)' -o wide
+```
+
+Inspect persistent volume claims. Confirm `Bound` status and check requested storage.
+
+```bash
+oc -n bigdata get pvc -l 'app in (namenode,datanode)' -o wide
+```
+
+Display pod labels. The `-l` selector matches pods whose `app` label is `namenode` or `datanode`.
+
+```bash
 oc -n bigdata get pods -l 'app in (namenode,datanode)' --show-labels
-echo
-echo 'Containers in each HDFS pod:'
-for pod in $(oc -n bigdata get pods -l 'app in (namenode,datanode)' -o name); do
-  printf '%s: ' "$pod"
-  oc -n bigdata get "$pod" -o jsonpath='{.spec.containers[*].name}'
-  echo
-done
-)
+```
+
+Show the container names inside this pod. Use these names with `oc exec -c` or `oc logs -c`.
+
+```bash
+oc -n bigdata get pod namenode-0 -o jsonpath='{.spec.containers[*].name}{"\n"}'
+```
+
+Show the container names inside this pod. Use these names with `oc exec -c` or `oc logs -c`.
+
+```bash
+oc -n bigdata get pod datanode-0 -o jsonpath='{.spec.containers[*].name}{"\n"}'
 ```
 
 ## 3. Inspect memory, CPU and storage
 
 Capacity is the physical node capacity. Allocatable resources are available to pods after platform reservations. Requests affect scheduling; limits cap individual containers.
 
+Compare total node CPU and memory with the allocatable resources available to pods.
+
 ```bash
-(
-# 3. Inspect memory, CPU and storage
-set -euo pipefail
 oc get nodes -o custom-columns='NODE:.metadata.name,CPU:.status.capacity.cpu,MEMORY:.status.capacity.memory,ALLOCATABLE_CPU:.status.allocatable.cpu,ALLOCATABLE_MEMORY:.status.allocatable.memory'
-echo
+```
+
+Inspect CPU and memory requests and limits already allocated on the node.
+
+```bash
 oc describe node | sed -n '/Allocated resources:/,/Events:/p'
-echo
+```
+
+Inspect StatefulSets, which manage the stable pod identities and persistent storage used by these services.
+
+```bash
 oc -n bigdata get statefulset namenode datanode -o custom-columns='NAME:.metadata.name,REPLICAS:.spec.replicas,READY:.status.readyReplicas'
-echo
+```
+
+Inspect persistent volume claims. Confirm `Bound` status and check requested storage.
+
+```bash
 oc -n bigdata get pvc -o custom-columns='PVC:.metadata.name,STATUS:.status.phase,SIZE:.status.capacity.storage,CLASS:.spec.storageClassName'
-)
 ```
 
 ## 4. Start HDFS and check readiness
 
+Set these workloads to one replica. This starts stopped workloads or keeps an existing single replica running.
+
 ```bash
-(
-# 4. Start HDFS and check readiness
-set -euo pipefail
 oc -n bigdata scale statefulset/namenode statefulset/datanode --replicas=1
+```
+
+Wait for `statefulset/namenode` to become ready. Continue only after rollout succeeds.
+
+```bash
 oc -n bigdata rollout status statefulset/namenode --timeout=300s
+```
+
+Wait for `statefulset/datanode` to become ready. Continue only after rollout succeeds.
+
+```bash
 oc -n bigdata rollout status statefulset/datanode --timeout=300s
+```
+
+List the matching pods and check their `READY` and `STATUS` columns.
+
+```bash
 oc -n bigdata get pods -l 'app in (namenode,datanode)'
+```
+
+Ask HDFS for its storage report. Confirm that a live DataNode is registered.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfsadmin -report
-)
 ```
 
 ## 5. Run HDFS commands without opening a shell
 
 `oc exec` is the Kubernetes equivalent of `docker exec`. Everything after `--` runs inside the selected container.
 
+List HDFS files and directories to check their paths and output files.
+
 ```bash
-(
-# 5. Run HDFS commands without opening a shell
-set -euo pipefail
 oc -n bigdata exec namenode-0 -- hdfs dfs -ls /
+```
+
+Create the HDFS input directory. `-p` also creates missing parent directories.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -mkdir -p /training/hello/input
+```
+
+Create the sample text file inside the NameNode container.
+
+```bash
 oc -n bigdata exec namenode-0 -- sh -c "printf 'hello hdfs\nhello openshift\n' > /tmp/hello.txt"
+```
+
+Upload the container file into HDFS. `-f` replaces only the named sample input file.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -put -f /tmp/hello.txt /training/hello/input/hello.txt
+```
+
+List HDFS files and directories to check their paths and output files.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -ls -h /training/hello/input
+```
+
+Read the HDFS file contents to verify the data.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -cat /training/hello/input/hello.txt
+```
+
+Download the HDFS file into the container filesystem.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -get -f /training/hello/input/hello.txt /tmp/hello-from-hdfs.txt
+```
+
+Read the file inside the container to verify its contents.
+
+```bash
 oc -n bigdata exec namenode-0 -- cat /tmp/hello-from-hdfs.txt
+```
+
+Create a local working directory on the VM for lesson files.
+
+```bash
 mkdir -p .state
+```
+
+Copy the file from the pod to the VM working directory.
+
+```bash
 oc -n bigdata cp namenode-0:/tmp/hello-from-hdfs.txt .state/hello-from-hdfs.txt -c namenode
+```
+
+Read the downloaded file on the VM and compare it with the HDFS source.
+
+```bash
 cat .state/hello-from-hdfs.txt
-)
 ```
 
 ## 6. Open an interactive shell
 
 Run this in a VM terminal. Exit the container shell with `exit`.
 
+Open a Bash shell inside the NameNode container. The next command runs inside that container.
+
 ```bash
-(
-# 6. Open an interactive shell
-set -euo pipefail
-echo 'Run: oc -n bigdata exec -it namenode-0 -- bash'
-echo 'Then try: hdfs dfs -ls /training/hello/input'
-)
+oc -n bigdata exec -it namenode-0 -- bash
+```
+
+Inside the container shell, list the HDFS input files.
+
+```bash
+hdfs dfs -ls /training/hello/input
+```
+
+Return from the container shell to the VM terminal before continuing.
+
+```bash
+exit
 ```
 
 ## 7. Copy files between the VM, a pod and HDFS
 
 `oc cp` copies between the VM filesystem and a container. `hdfs dfs -put` then copies from the container filesystem into HDFS.
 
+Create a local working directory on the VM for lesson files.
+
 ```bash
-(
-# 7. Copy files between the VM, a pod and HDFS
-set -euo pipefail
 mkdir -p .state/hdfs-upload
+```
+
+Write a small sample text file on the VM.
+
+```bash
 printf 'red blue red\nblue green\n' > .state/hdfs-upload/colors.txt
+```
+
+Write a small sample text file on the VM.
+
+```bash
 printf 'one two three two\n' > .state/hdfs-upload/numbers.txt
+```
+
+Copy the local lesson file or directory from the VM into the selected container.
+
+```bash
 oc -n bigdata cp .state/hdfs-upload namenode-0:/tmp/hdfs-upload -c namenode
+```
+
+Create the HDFS input directory. `-p` also creates missing parent directories.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -mkdir -p /training/uploads
-# Expand the wildcard inside the container, not on the Linux VM.
+```
+
+Upload the container file into HDFS. `-f` replaces only the named sample input file.
+
+```bash
 oc -n bigdata exec namenode-0 -- sh -c 'hdfs dfs -put -f /tmp/hdfs-upload/* /training/uploads/'
+```
+
+List HDFS files and directories to check their paths and output files.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -ls /training/uploads
+```
+
+Read the HDFS file contents to verify the data.
+
+```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -cat /training/uploads/colors.txt
-)
 ```
 
 ## 8. Open the HDFS web interfaces locally
 
 Keep each forwarding command running in its terminal. Open the URLs in the browser inside the VM.
 
+In a separate VM terminal, run `okd-env`, then start this forward. Keep it running and open http://127.0.0.1:19870 in the VM browser. Press Ctrl+C when finished.
+
 ```bash
-(
-# 8. Open the HDFS web interfaces locally
-set -euo pipefail
-echo 'Terminal 1: oc -n bigdata port-forward --address=127.0.0.1 service/namenode 19870:9870'
-echo 'NameNode UI: http://127.0.0.1:19870'
-echo
-echo 'Terminal 2: oc -n bigdata port-forward --address=127.0.0.1 service/datanode 19864:9864'
-echo 'DataNode UI: http://127.0.0.1:19864'
-)
+oc -n bigdata port-forward --address=127.0.0.1 service/namenode 19870:9870
+```
+
+In a separate VM terminal, run `okd-env`, then start this forward. Keep it running and open http://127.0.0.1:19864 in the VM browser. Press Ctrl+C when finished.
+
+```bash
+oc -n bigdata port-forward --address=127.0.0.1 service/datanode 19864:9864
 ```
 
 ## 9. View logs, restart and stop
 
 Restarting pods preserves files because the NameNode and DataNode use PVCs. Scaling HDFS to zero stops the processes without deleting PVCs.
 
-```bash
-(
-# 9. View logs, restart and stop
-set -euo pipefail
-oc -n bigdata logs namenode-0 --tail=30
-oc -n bigdata logs datanode-0 --tail=30
-oc -n bigdata rollout restart statefulset/namenode statefulset/datanode
-oc -n bigdata rollout status statefulset/namenode --timeout=300s
-oc -n bigdata rollout status statefulset/datanode --timeout=300s
-oc -n bigdata exec namenode-0 -- hdfs dfs -cat /training/hello/input/hello.txt
-)
-```
+Read recent logs from `namenode-0`. Check for startup or connection errors.
 
 ```bash
-(
-# 9. View logs, restart and stop
-set -euo pipefail
-echo 'Optional stop:'
-echo 'oc -n bigdata scale statefulset/namenode statefulset/datanode --replicas=0'
-echo
-echo 'Start again:'
-echo 'oc -n bigdata scale statefulset/namenode statefulset/datanode --replicas=1'
-)
+oc -n bigdata logs namenode-0 --tail=30
+```
+
+Read recent logs from `datanode-0`. Check for startup or connection errors.
+
+```bash
+oc -n bigdata logs datanode-0 --tail=30
+```
+
+Restart these workloads. Their persistent volumes remain attached; wait for readiness in the following steps.
+
+```bash
+oc -n bigdata rollout restart statefulset/namenode statefulset/datanode
+```
+
+Wait for `statefulset/namenode` to become ready. Continue only after rollout succeeds.
+
+```bash
+oc -n bigdata rollout status statefulset/namenode --timeout=300s
+```
+
+Wait for `statefulset/datanode` to become ready. Continue only after rollout succeeds.
+
+```bash
+oc -n bigdata rollout status statefulset/datanode --timeout=300s
+```
+
+Read the HDFS file contents to verify the data.
+
+```bash
+oc -n bigdata exec namenode-0 -- hdfs dfs -cat /training/hello/input/hello.txt
+```
+
+### Optional: stop and start again
+
+Stop these workloads without deleting their storage.
+
+```bash
+oc -n bigdata scale statefulset/namenode statefulset/datanode --replicas=0
+```
+
+Set these workloads to one replica. This starts stopped workloads or keeps an existing single replica running.
+
+```bash
+oc -n bigdata scale statefulset/namenode statefulset/datanode --replicas=1
 ```
 
 ## 10. Useful troubleshooting commands
 
+Read the most recent project events to find workload errors.
+
 ```bash
-(
-# 10. Useful troubleshooting commands
-set -euo pipefail
 oc -n bigdata get events --sort-by=.lastTimestamp | tail -30
+```
+
+Inspect the NameNode conditions and events for scheduling or startup problems.
+
+```bash
 oc -n bigdata describe pod namenode-0 | sed -n '/Conditions:/,/Events:/p'
+```
+
+Check which pod addresses back the HDFS Services.
+
+```bash
 oc -n bigdata get endpointslice -l 'kubernetes.io/service-name in (namenode,datanode)' -o wide
-)
 ```

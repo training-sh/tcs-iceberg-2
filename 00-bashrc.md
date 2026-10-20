@@ -42,7 +42,7 @@ okd-env() {
         echo "Cannot read CRC status. Check libvirt and the user session." >&2
         return 1
     fi
-    if ! grep -Eq '^OpenShift:[[:space:]]+Running' <<<"$crc_state"; then
+    if ! grep -Eq '^(OpenShift|OKD):[[:space:]]+Running' <<<"$crc_state"; then
         echo "OKD is stopped. Run: okd-start" >&2
         return 1
     fi

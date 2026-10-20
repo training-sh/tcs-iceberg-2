@@ -20,15 +20,15 @@ See the [OKD project overview](https://okd.io/docs/project/) and
 
 ## Index
 
-1. [00 - Bash configuration](../00-bashrc.md): `.bashrc` additions and validation; apply after installing CRC.
-2. [00 - Installation](00-Installation.md)
+1. [00 - Bash configuration](../00-bashrc.md): remaining setup; apply the `.bashrc` additions and validations on the supplied training VM.
+2. [00 - Installation](00-Installation.md): installation instructions are for information only; CRC is already installed and prepared.
 3. [01 - CRC commands](01-CRC-Commands.md)
 4. [02 - OpenShift oc commands](02-OC-Commands.md)
 5. [03 - Architecture](03-Architecture.md)
 
 ## Training guides
 
-Read [`00-Installation.md`](00-Installation.md) and run its fenced Bash blocks in the VM terminal. Use [00-bashrc.md](../00-bashrc.md) for the three `.bashrc` additions and three validation stages. Back up your existing `~/.bashrc` before applying the additions.
+CRC installation and initial preparation are already complete on the supplied training VM, so there is no need to install it again. The host requirements and installation instructions in [`00-Installation.md`](00-Installation.md) are for information only. Complete the remaining setup using [00-bashrc.md](../00-bashrc.md): apply the three `.bashrc` additions and run the three validation stages in the VM terminal. Back up your existing `~/.bashrc` before applying the additions. Then use the startup and operational sections of the installation guide as needed.
 
 
 Read [`03-Architecture.md`](03-Architecture.md) for the illustrated guide covering the stack, pods, containers, storage, databases and CRC system services. Diagram sources and PNG/SVG assets are in `assets/`; rebuild them with `python assets/build_architecture.py` (Pillow required).
