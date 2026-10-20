@@ -1,0 +1,8 @@
+
+# Linux shell configuration and copyable installation commands
+00-Introduction/00-Installation.md text eol=lf
+system-ctl-fix.md text eol=lf
+00-Introduction/01-CRC-Commands.md text eol=lf
+00-Introduction/02-OC-Commands.md text eol=lf
+01-GetStarted/*.md text eol=lf
+00-bashrc.md text eol=lf

@@ -1,23 +1,7 @@
+# CRC on a cloned Linux VM
 
-CRC not reflecting in the cloned machine
+Follow [the Bash configuration guide](00-bashrc.md#three-separate-additions-to-bashrc) for the three Bash additions: OKD helpers, CRC/oc PATH, and the user session environment.
 
-```
-cat <<'EOF' | tee -a ~/.bashrc
+Then run all [three validation stages](00-bashrc.md#validation-1-bash-syntax-and-preserved-programs), including `systemctl --user daemon-reload`. The guide includes recovery steps if the current user has no runtime directory or D-Bus socket. Exporting variables alone cannot create either one.
 
-# CRC / OpenShift
-export PATH="$HOME/.local/bin:$HOME/.crc/bin/oc:$PATH"
-EOF
-```
-
-```
-
-
-export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
-
-echo "XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR"
-echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
-
-systemctl --user daemon-reload
-
-```
+Back up your existing `~/.bashrc` before applying the additions in the Bash configuration guide. Do not paste Markdown prose or fences into it.

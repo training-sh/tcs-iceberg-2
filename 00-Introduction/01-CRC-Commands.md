@@ -1,4 +1,10 @@
-# CRC (OpenShift Local / OKD) Command Cheat Sheet
+# 01 - CRC lifecycle commands
+
+> **DO NOT DELETE lab resources or run cleanup/reset commands.** Deletion examples below are reference only and are commented out. Do not uncomment or run them during this course.
+
+Deletion, cleanup, and reset command lines are **commented out with `#` to avoid accidental execution**. In Bash, a line beginning with `#` is a comment and is not executed when pasted into the terminal. Keep these lines commented; do not remove the `#`.
+
+Run selected Bash blocks in the **Linux VM terminal**, not in a Python notebook. This is a command reference, not a script to execute from top to bottom. Complete [installation](00-Installation.md) and the [three Bash validations](../00-bashrc.md) first. Cluster commands require a running cluster and a valid login; cluster-wide listings may require administrator access.
 
 CRC provides a local single-node OpenShift/OKD cluster for development, testing, demonstrations, and training.
 
@@ -9,12 +15,14 @@ CRC provides a local single-node OpenShift/OKD cluster for development, testing,
 Check where CRC is installed:
 
 ```bash
-which crc
+# Check where CRC is installed
+command -v crc
 ```
 
 Check CRC version:
 
 ```bash
+# Check CRC version
 crc version
 ```
 
@@ -31,18 +39,21 @@ Example installation path:
 Display available commands:
 
 ```bash
+# Display available commands
 crc help
 ```
 
 Help for a specific command:
 
 ```bash
+# Help for a specific command
 crc help start
 ```
 
 or:
 
 ```bash
+# or
 crc start --help
 ```
 
@@ -53,6 +64,7 @@ crc start --help
 Before starting CRC for the first time:
 
 ```bash
+# Before starting CRC for the first time
 crc setup
 ```
 
@@ -65,6 +77,7 @@ This prepares the host system for running the CRC virtual machine.
 Start the OpenShift/OKD cluster:
 
 ```bash
+# Start the OpenShift/OKD cluster
 crc start
 ```
 
@@ -75,6 +88,7 @@ CRC starts a local VM containing the OpenShift/OKD cluster.
 ## 5. Check CRC Status
 
 ```bash
+#  5. Check CRC Status
 crc status
 ```
 
@@ -99,6 +113,7 @@ Disk Usage:      ...
 ## 6. Stop CRC
 
 ```bash
+#  6. Stop CRC
 crc stop
 ```
 
@@ -107,6 +122,7 @@ This stops the CRC VM without deleting the cluster.
 Start it again using:
 
 ```bash
+# Start it again using
 crc start
 ```
 
@@ -119,8 +135,8 @@ CRC does not require a special restart command.
 Use:
 
 ```bash
-crc stop
-crc start
+# Use
+crc stop && crc start
 ```
 
 ---
@@ -128,6 +144,7 @@ crc start
 ## 8. Get CRC IP Address
 
 ```bash
+#  8. Get CRC IP Address
 crc ip
 ```
 
@@ -140,12 +157,14 @@ This displays the IP address used by the CRC virtual machine.
 Open the console using the default browser:
 
 ```bash
+# Open the console using the default browser
 crc console
 ```
 
 Display only the console URL:
 
 ```bash
+# Display only the console URL
 crc console --url
 ```
 
@@ -154,6 +173,7 @@ crc console --url
 ## 10. Get OpenShift Login Credentials
 
 ```bash
+#  10. Get OpenShift Login Credentials
 crc console --credentials
 ```
 
@@ -177,70 +197,48 @@ CRC provides an OpenShift CLI binary.
 Display the required environment configuration:
 
 ```bash
+# Display the required environment configuration
 crc oc-env
 ```
 
 Example output:
 
-```bash
+```text
 export PATH="/home/dev/.crc/bin/oc:$PATH"
 ```
 
 Apply it to the current terminal:
 
 ```bash
+# Apply it to the current terminal
 eval "$(crc oc-env)"
 ```
 
 Verify:
 
 ```bash
-which oc
+# Verify
+command -v oc
 ```
 
 Then:
 
 ```bash
+# Then
 oc version
 ```
 
 ---
 
-## 12. Permanent PATH Configuration
+## 12. Permanent PATH and cloned-VM session configuration
 
-If CRC is installed at:
-
-```text
-/home/dev/.local/bin/crc
-```
-
-and `oc` is provided at:
-
-```text
-/home/dev/.crc/bin/oc/oc
-```
-
-add both directories to `~/.bashrc`:
+Use the [three `.bashrc` additions and validations](../00-bashrc.md#three-separate-additions-to-bashrc). They preserve existing PATH entries, add CRC and `oc`, and check the user runtime directory and D-Bus socket before `systemctl --user daemon-reload`. Do not append another unmarked PATH block.
 
 ```bash
-cat <<'EOF' | tee -a ~/.bashrc
-
-# CRC / OpenShift
-export PATH="$HOME/.local/bin:$HOME/.crc/bin/oc:$PATH"
-EOF
-```
-
-Reload the shell:
-
-```bash
-source ~/.bashrc
-```
-
-Verify:
-
-```bash
-which crc
-which oc
+# Check syntax before loading your existing shell configuration.
+bash -n "$HOME/.bashrc" && source "$HOME/.bashrc"
+command -v crc
+command -v oc
 ```
 
 ---
@@ -248,6 +246,7 @@ which oc
 ## 13. View CRC Configuration
 
 ```bash
+#  13. View CRC Configuration
 crc config view
 ```
 
@@ -258,12 +257,14 @@ crc config view
 Example:
 
 ```bash
-crc config set cpus 6
+# Example
+crc config set cpus 4
 ```
 
 Check:
 
 ```bash
+# Check
 crc config view
 ```
 
@@ -273,35 +274,30 @@ CPU changes may require recreating/restarting the CRC environment depending on t
 
 ## 15. Configure Memory
 
-Example: configure approximately 24 GB RAM.
+Example: configure 16 GiB RAM (16384 MiB).
 
 ```bash
-crc config set memory 24576
+# Example: configure 16 GiB RAM (16384 MiB).
+crc config set memory 16384
 ```
 
 Check:
 
 ```bash
+# Check
 crc config view
 ```
 
 ---
 
-## 16. Configure Disk Size
-
-Check available CRC configuration options:
+## 16. Configure disk before initial cluster creation
 
 ```bash
-crc config
-```
-
-or:
-
-```bash
+# Use the course profile before the first start; this does not resize an existing disk.
+crc config set disk-size 50
+crc config view
 crc config --help
 ```
-
-Available disk configuration options can vary by CRC version.
 
 ---
 
@@ -310,18 +306,21 @@ Available disk configuration options can vary by CRC version.
 First:
 
 ```bash
+# First
 crc status
 ```
 
 Then configure `oc` if required:
 
 ```bash
+# Then configure oc if required
 eval "$(crc oc-env)"
 ```
 
 Check the OpenShift node:
 
 ```bash
+# Check the OpenShift node
 oc get nodes
 ```
 
@@ -329,7 +328,7 @@ Example:
 
 ```text
 NAME   STATUS   ROLES                         AGE   VERSION
-crc    Ready    control-plane,master,worker   34d   v1.35.5
+crc    Ready    control-plane,master,worker   34d   <bundle-version>
 ```
 
 A CRC cluster normally uses a **single node** for:
@@ -345,12 +344,14 @@ This is normal for CRC.
 ## 18. Check OpenShift Operators
 
 ```bash
+#  18. Check OpenShift Operators
 oc get clusteroperators
 ```
 
 Short form:
 
 ```bash
+# Short form
 oc get co
 ```
 
@@ -364,6 +365,7 @@ True        False         False
 Check important control-plane operators:
 
 ```bash
+# Check important control-plane operators
 oc get co kube-apiserver kube-controller-manager kube-scheduler etcd
 ```
 
@@ -372,12 +374,14 @@ oc get co kube-apiserver kube-controller-manager kube-scheduler etcd
 ## 19. Check OpenShift Version
 
 ```bash
+#  19. Check OpenShift Version
 oc get clusterversion
 ```
 
-Short form:
+Named cluster-version resource:
 
 ```bash
+# Named cluster-version resource
 oc get clusterversion version
 ```
 
@@ -386,24 +390,28 @@ oc get clusterversion version
 ## 20. Check OpenShift API
 
 ```bash
+#  20. Check OpenShift API
 oc cluster-info
 ```
 
 Check currently logged-in user:
 
 ```bash
+# Check currently logged-in user
 oc whoami
 ```
 
 Check API server:
 
 ```bash
+# Check API server
 oc whoami --show-server
 ```
 
 Check console URL:
 
 ```bash
+# Check console URL
 oc whoami --show-console
 ```
 
@@ -411,27 +419,36 @@ oc whoami --show-console
 
 ## 21. Delete CRC Cluster
 
-> **WARNING:** This destroys the local CRC cluster.
+> **DO NOT DELETE the CRC cluster.** This destroys the lab and its stored data.
+
+> **DO NOT RUN: DO NOT DELETE.** This example removes lab resources, cluster data, or host configuration. Reference only.
 
 ```bash
-crc delete
+# DO NOT RUN OR UNCOMMENT: deletion/cleanup is prohibited during the course.
+#  WARNING: This destroys the local CRC cluster.
+# crc delete
 ```
 
-Applications and cluster configuration stored inside the CRC cluster will be lost.
+Applications, cluster configuration, and data on the CRC VM disk will be lost. This is not a restart command.
 
 ---
 
 ## 22. Clean CRC Environment
 
-> **WARNING:** Use this for cleanup/troubleshooting, not as a normal daily command.
+> **DO NOT RUN `crc cleanup`.** It removes the CRC instance and host setup; it is not a course troubleshooting step.
+
+> **DO NOT RUN: DO NOT DELETE.** This example removes lab resources, cluster data, or host configuration. Reference only.
 
 ```bash
-crc cleanup
+# DO NOT RUN OR UNCOMMENT: deletion/cleanup is prohibited during the course.
+#  WARNING: Use this for cleanup/troubleshooting, not as a normal daily command.
+# crc cleanup
 ```
 
 After cleanup, setup may be required again:
 
 ```bash
+# After cleanup, setup may be required again
 crc setup
 ```
 
@@ -439,17 +456,21 @@ crc setup
 
 ## 23. Recreate CRC Cluster
 
-When a completely fresh environment is required:
+**DO NOT recreate or reset the course cluster.** The sequence below is disabled and retained only to explain the commands:
+
+> **DO NOT RUN: DO NOT DELETE.** This example removes lab resources, cluster data, or host configuration. Reference only.
 
 ```bash
-crc stop
-crc delete
-crc cleanup
-crc setup
-crc start
+# DO NOT RUN OR UNCOMMENT: deletion/cleanup is prohibited during the course.
+# When a completely fresh environment is required
+# crc stop &&
+# crc delete &&
+# crc cleanup &&
+# crc setup &&
+# crc start
 ```
 
-> This destroys the existing local cluster.
+> This destroys the existing local cluster and its disk data.
 
 ---
 
@@ -458,48 +479,56 @@ crc start
 Check status:
 
 ```bash
+# Check status
 crc status
 ```
 
 Check configuration:
 
 ```bash
+# Check configuration
 crc config view
 ```
 
 Check CRC version:
 
 ```bash
+# Check CRC version
 crc version
 ```
 
 Check IP:
 
 ```bash
+# Check IP
 crc ip
 ```
 
 Check OpenShift node:
 
 ```bash
+# Check OpenShift node
 oc get nodes
 ```
 
 Check cluster operators:
 
 ```bash
+# Check cluster operators
 oc get co
 ```
 
 Check pods:
 
 ```bash
+# Check pods
 oc get pods -A
 ```
 
 Check recent events:
 
 ```bash
+# Check recent events
 oc get events -A --sort-by=.metadata.creationTimestamp
 ```
 
@@ -514,9 +543,9 @@ For normal training/lab usage, these are the most useful commands:
 crc status
 
 # Start CRC
-crc start
+okd-start
 
-# Configure oc
+# Configure oc (client PATH only; okd-start also loads the administrator kubeconfig)
 eval "$(crc oc-env)"
 
 # Check OpenShift node
@@ -535,6 +564,7 @@ crc console --credentials
 When finished:
 
 ```bash
+# When finished
 crc stop
 ```
 
@@ -555,10 +585,10 @@ crc stop
 | Credentials | `crc console --credentials` |
 | Configure OC | `eval "$(crc oc-env)"` |
 | View config | `crc config view` |
-| Set CPUs | `crc config set cpus 6` |
-| Set RAM | `crc config set memory 24576` |
-| Delete cluster | `crc delete` |
-| Cleanup | `crc cleanup` |
+| Set CPUs | `crc config set cpus 4` |
+| Set RAM | `crc config set memory 16384` |
+| Delete cluster ? **DO NOT RUN** | `# crc delete` |
+| Cleanup ? **DO NOT RUN** | `# crc cleanup` |
 
 ---
 
@@ -595,3 +625,5 @@ worker
 roles.
 
 CRC manages the local cluster lifecycle, while `oc` is used to manage resources **inside OpenShift/OKD**.
+
+Sources: [CRC usage](https://crc.dev/docs/using/), [configuration](https://crc.dev/docs/configuring/), [troubleshooting](https://crc.dev/docs/troubleshooting/). Use `crc COMMAND --help` for the installed version.
