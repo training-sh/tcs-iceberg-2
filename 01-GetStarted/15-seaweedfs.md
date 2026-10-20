@@ -487,3 +487,19 @@ For `AccessDenied` or signature errors, check the endpoint, `team` / `team1234` 
 If `okd-env` says the cluster is stopped even though `crc status` reports `OKD: Running`, update the helper from [Bash configuration](../00-bashrc.md). Its status check must accept both `OpenShift: Running` and `OKD: Running`.
 
 Command references: [AWS CLI S3 operations](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-s3-commands.html), [object metadata](https://docs.aws.amazon.com/cli/latest/reference/s3api/head-object.html), and [SeaweedFS](https://github.com/seaweedfs/seaweedfs).
+
+## Watch Kubernetes logs
+
+`oc logs` is the Kubernetes equivalent of `docker logs`. Run follow commands in a separate VM terminal after `okd-env`. Press Ctrl+C to stop following; this does not stop the workload. A scaled-to-zero workload has no current pod logs.
+
+Follow SeaweedFS logs while running S3 commands.
+
+```bash
+oc -n bigdata logs -f seaweedfs-0 -c seaweedfs --tail=50 --timestamps
+```
+
+Read storage messages from the last ten minutes.
+
+```bash
+oc -n bigdata logs seaweedfs-0 -c seaweedfs --since=10m --timestamps
+```

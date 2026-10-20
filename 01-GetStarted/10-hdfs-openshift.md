@@ -352,6 +352,8 @@ oc -n bigdata exec namenode-0 -- hdfs dfs -cat /training/hello/input/hello.txt
 
 ### Optional: stop and start again
 
+Skip this optional stop while continuing to the later lessons or Jupyter: they require HDFS to remain running. A port-forward cannot start a stopped NameNode.
+
 Stop these workloads without deleting their storage.
 
 ```bash
@@ -382,4 +384,20 @@ Check which pod addresses back the HDFS Services.
 
 ```bash
 oc -n bigdata get endpointslice -l 'kubernetes.io/service-name in (namenode,datanode)' -o wide
+```
+
+## Watch Kubernetes logs
+
+`oc logs` is the Kubernetes equivalent of `docker logs`. Run follow commands in a separate VM terminal after `okd-env`. Press Ctrl+C to stop following; this does not stop the workload. A scaled-to-zero workload has no current pod logs.
+
+Follow NameNode logs while running HDFS commands.
+
+```bash
+oc -n bigdata logs -f namenode-0 --tail=50 --timestamps
+```
+
+Read recent DataNode logs for registration and storage errors.
+
+```bash
+oc -n bigdata logs datanode-0 --since=10m --timestamps
 ```

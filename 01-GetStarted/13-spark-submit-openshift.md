@@ -71,13 +71,25 @@ oc -n bigdata exec namenode-0 -- hdfs dfs -put -f /tmp/spark-words.txt /training
 Reference only: keep this deletion command commented out.
 
 ```bash
-# oc -n bigdata exec namenode-0 -- hdfs dfs -rm -r -f /training/spark/spark-word-count
+# oc -n bigdata exec namenode-0 -- hdfs dfs -rm -r -f /training/spark/output/spark-word-count
 ```
 
 Read the HDFS file contents to verify the data.
 
 ```bash
 oc -n bigdata exec namenode-0 -- hdfs dfs -cat /training/spark/input/words.txt
+```
+
+Prepare a separate output parent. Spark runs as `spark`, while the sample input was uploaded by the HDFS lab account.
+
+```bash
+oc -n bigdata exec namenode-0 -- hdfs dfs -mkdir -p /training/spark/output
+```
+
+Give Spark ownership of only this output parent. Do not change the input directory or use a recursive ownership change.
+
+```bash
+oc -n bigdata exec namenode-0 -- hdfs dfs -chown spark /training/spark/output
 ```
 
 ## 3. Create the PySpark application in the Jupyter container
@@ -98,7 +110,7 @@ from operator import add
 spark = SparkSession.builder.appName('hdfs-word-count').getOrCreate()
 sc = spark.sparkContext
 input_path = 'hdfs://namenode:9000/training/spark/input'
-output_path = 'hdfs://namenode:9000/training/spark/spark-word-count'
+output_path = 'hdfs://namenode:9000/training/spark/output/spark-word-count'
 words = sc.textFile(input_path).flatMap(lambda line: line.split()).map(lambda word: (word.lower(), 1)).reduceByKey(add)
 words.sortByKey().map(lambda item: f'{item[0]}\t{item[1]}').saveAsTextFile(output_path)
 print('RESULT:', words.sortByKey().collect())
@@ -151,13 +163,13 @@ oc -n bigdata exec spark-master-0 -c jupyter -- spark-submit \
 List HDFS files and directories to check their paths and output files.
 
 ```bash
-oc -n bigdata exec namenode-0 -- hdfs dfs -ls /training/spark/spark-word-count
+oc -n bigdata exec namenode-0 -- hdfs dfs -ls /training/spark/output/spark-word-count
 ```
 
 Read the HDFS file contents to verify the data.
 
 ```bash
-oc -n bigdata exec namenode-0 -- sh -c "hdfs dfs -cat '/training/spark/spark-word-count/part-*' | sort"
+oc -n bigdata exec namenode-0 -- sh -c "hdfs dfs -cat '/training/spark/output/spark-word-count/part-*' | sort"
 ```
 
 ## 6. Inspect Spark application state and logs
@@ -178,4 +190,26 @@ In a separate VM terminal, run `okd-env`, then start this forward. Keep it runni
 
 ```bash
 oc -n bigdata port-forward --address=127.0.0.1 service/spark-master 18080:8080
+```
+
+## Watch Kubernetes logs
+
+`oc logs` is the Kubernetes equivalent of `docker logs`. Run follow commands in a separate VM terminal after `okd-env`. Press Ctrl+C to stop following; this does not stop the workload. A scaled-to-zero workload has no current pod logs.
+
+Follow Spark master logs during submission.
+
+```bash
+oc -n bigdata logs -f spark-master-0 -c spark-master --tail=50 --timestamps
+```
+
+Read Spark worker logs for executor scheduling errors.
+
+```bash
+oc -n bigdata logs spark-worker-0 -c spark-worker --since=10m --timestamps
+```
+
+Read the Jupyter server logs. The driver launched by oc exec prints to the submitting terminal, rather than necessarily appearing in these container logs.
+
+```bash
+oc -n bigdata logs spark-master-0 -c jupyter --tail=50 --timestamps
 ```

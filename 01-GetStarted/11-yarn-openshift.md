@@ -233,3 +233,25 @@ Inspect the workload definitions and Services for these components.
 ```bash
 oc -n bigdata get deployment resourcemanager nodemanager historyserver
 ```
+
+## Watch Kubernetes logs
+
+`oc logs` is the Kubernetes equivalent of `docker logs`. Run follow commands in a separate VM terminal after `okd-env`. Press Ctrl+C to stop following; this does not stop the workload. A scaled-to-zero workload has no current pod logs.
+
+Follow ResourceManager logs while a MapReduce job runs. YARN must be started first.
+
+```bash
+oc -n bigdata logs -f deployment/resourcemanager --tail=50 --timestamps
+```
+
+Read NodeManager logs for container startup errors.
+
+```bash
+oc -n bigdata logs deployment/nodemanager --since=10m --timestamps
+```
+
+Read MapReduce History Server logs while that optional service is running.
+
+```bash
+oc -n bigdata logs deployment/historyserver --tail=50 --timestamps
+```

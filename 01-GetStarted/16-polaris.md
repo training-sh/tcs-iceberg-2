@@ -2,7 +2,7 @@
 
 Run these steps after [15 - SeaweedFS S3](15-seaweedfs.md). Commands run in the VM terminal unless a step explicitly switches to a container Bash shell or the PySpark Python prompt. Each command has a separate purpose; check its result before continuing.
 
-This disposable exercise creates a catalog, namespace, and table, writes rows, examines the resulting S3 files, and removes the demo resources. Leave the existing `training` catalog and `warehouse` bucket untouched. All new demo names end in `temp`.
+This exercise creates a catalog, namespace, and table, writes rows, and examines the resulting S3 files. **Keep these resources: lesson 17 reuses them.** The `temp` suffix marks classroom examples; it does not mean they are deleted automatically. Leave the existing `training` catalog and `warehouse` bucket untouched. All new demo names end in `temp`.
 
 | Layer | Demo name | Purpose |
 |---|---|---|
@@ -67,7 +67,7 @@ In **terminal B**, run `okd-env`, then forward the SeaweedFS S3 API and admin UI
 oc -n bigdata port-forward --address=127.0.0.1 service/seaweedfs 19001:8333 19002:23646
 ```
 
-Use a separate **terminal C** for the API and AWS commands below. Keep that terminal open through cleanup so its variables remain available. The later container/PySpark shell runs in **terminal D**.
+Use a separate **terminal C** for the API and AWS commands below. Keep that terminal open through the API and S3 inspection steps so its variables remain available. The later container/PySpark shell runs in **terminal D**.
 
 | Interface | URL from the VM | Credentials |
 |---|---|---|
@@ -285,7 +285,7 @@ pyspark --master 'local[1]' --driver-memory 512m \
 
 Event logging is disabled for this small demo so the session does not write Spark history logs into the shared `warehouse` bucket.
 
-Wait for the Python `>>>` prompt. All `python` blocks below run at that prompt, where `spark` already exists. Do not type them into Bash or paste Markdown fences. Keep this session open through section 11; terminal C remains available for REST and S3 inspection.
+Wait for the Python `>>>` prompt. All `python` blocks below run at that prompt, where `spark` already exists. Do not type them into Bash or paste Markdown fences. Keep this session open through section 10; terminal C remains available for REST and S3 inspection.
 
 Reduce routine Spark logs so query results are easier to read.
 
@@ -473,93 +473,60 @@ aws --endpoint-url "$S3_ENDPOINT" s3 ls s3://demo-catalog-temp/ --recursive --hu
 
 In the verified run, the two appends produced nine objects: two Parquet data files, three metadata JSON versions, two Avro manifests, and two Avro manifest lists. Generated names and file counts can vary with write planning; use the metadata tables to identify the files actually referenced by each snapshot.
 
-## 11. Remove the demo table and namespace
+## 11. Keep the demo for the Jupyter notebook
 
-These steps intentionally delete only the resources created in this lesson. First return to the still-open **PySpark prompt in terminal D**. Remove the table registration without `PURGE`, so its S3 files remain available for the next comparison. Do not manually delete files from a registered Iceberg table.
+**Do not drop the table, namespace, catalog, or bucket.** [17-0-Jupyter.md](17-0-Jupyter.md) explains how to open [17-1-pypark.ipynb](17-1-pypark.ipynb), which reads this table, its three rows, and its snapshot history before adding separate examples.
 
-```python
-spark.sql("DROP TABLE demo_catalog_temp.demo_database_temp.demo_table_temp").show()
-```
-
-Confirm the namespace is now empty.
-
-```python
-spark.sql("SHOW TABLES IN demo_catalog_temp.demo_database_temp").show(truncate=False)
-```
-
-Remove the empty demo namespace.
-
-```python
-spark.sql("DROP NAMESPACE demo_catalog_temp.demo_database_temp").show()
-```
-
-Stop the Spark session.
+In terminal D's PySpark prompt, release this Spark session. Stopping Spark does not remove catalog registrations or stored data.
 
 ```python
 spark.stop()
 ```
 
-Leave the Python interpreter and return to the container Bash shell.
+Leave the Python interpreter.
 
 ```python
 exit()
 ```
 
-Leave the container shell and return to the VM.
+Return from the container Bash shell to the VM.
 
 ```bash
 exit
 ```
 
-## 12. Delete the empty catalog, then its remaining S3 files
+Stop the manual forwards with Ctrl+C when finished. Close terminal C to discard its token and temporary client environment. The in-cluster notebook uses Service addresses and does not need these forwards to access Polaris or SeaweedFS.
 
-Return to **terminal C**. Confirm the demo bucket still contains files after the non-purging table drop. Removing a catalog registration and deleting object-store data are separate operations.
+Retain all of the following for the next lesson:
 
-```bash
-aws --endpoint-url "$S3_ENDPOINT" s3 ls s3://demo-catalog-temp/ --recursive
-```
+| Resource | Expected state |
+|---|---|
+| `demo-catalog-temp` | Contains Iceberg data and metadata objects |
+| `demo_catalog_temp` | Registered in Polaris |
+| `demo_database_temp` | Contains `demo_table_temp` |
+| `demo_table_temp` | Three rows, with two append snapshots |
 
-Delete the now-empty Polaris catalog. The command targets only `demo_catalog_temp`; do not substitute `training`.
+## 12. Watch Kubernetes logs
 
-```bash
-curl -fsS -X DELETE "$POLARIS_URL/api/management/v1/catalogs/demo_catalog_temp" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Polaris-Realm: POLARIS'
-```
+`oc logs` is the Kubernetes equivalent of `docker logs`. Polaris serves catalog requests, SeaweedFS serves object requests, and Jupyter hosts the notebook kernel. Do not restart a workload merely to see its logs.
 
-List catalogs again. The demo catalog should be absent and `training` should remain.
-
-```bash
-curl -fsS "$POLARIS_URL/api/management/v1/catalogs" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Polaris-Realm: POLARIS' | python3 -m json.tool
-```
-
-Preview deletion of the orphaned files in this disposable bucket. Check that every displayed URI starts with `s3://demo-catalog-temp/`.
+Follow Polaris logs in a separate VM terminal. Ctrl+C stops following logs; it does not stop Polaris.
 
 ```bash
-aws --endpoint-url "$S3_ENDPOINT" s3 rm s3://demo-catalog-temp/ --recursive --dryrun
+oc -n bigdata logs -f deployment/polaris -c polaris --tail=50 --timestamps
 ```
 
-Delete only this demo bucket's remaining objects, after the table and catalog have been removed.
+Read recent SeaweedFS server logs while investigating storage errors.
 
 ```bash
-aws --endpoint-url "$S3_ENDPOINT" s3 rm s3://demo-catalog-temp/ --recursive
+oc -n bigdata logs seaweedfs-0 -c seaweedfs --since=10m --timestamps
 ```
 
-Remove the empty demo bucket, without `--force`.
+Read Jupyter server and kernel lifecycle logs. Notebook cell output is displayed in the notebook; it is not guaranteed to appear in container logs.
 
 ```bash
-aws --endpoint-url "$S3_ENDPOINT" s3 rb s3://demo-catalog-temp
+oc -n bigdata logs spark-master-0 -c jupyter --tail=50 --timestamps
 ```
-
-Confirm it is absent and the existing `warehouse` bucket remains.
-
-```bash
-aws --endpoint-url "$S3_ENDPOINT" s3 ls
-```
-
-Stop the forwards with Ctrl+C in terminals A and B. Close terminal C to discard the temporary token and AWS client environment. Local request/response files remain in `$DEMO_DIR` for inspection; the catalog, namespace, table, and S3 bucket are not reused by later lessons.
 
 ## 13. Troubleshoot without resetting the lab
 
@@ -567,6 +534,6 @@ For 401 errors, request a fresh token. For 403 errors, check the realm, catalog 
 
 For location errors, compare the table location against `allowedLocations`. For connection errors inside Spark or Polaris, use `polaris:8181` and `seaweedfs:8333`; `127.0.0.1` inside a pod is not the VM port-forward. If PySpark cannot find Iceberg classes, use this deployment's Jupyter container with the installed runtime jars.
 
-For failures after a partial run, inspect whether the demo table, namespace, and catalog still exist. Clean up in that order before deleting the dedicated demo bucket. Do not reset PostgreSQL, rerun bootstrap, or delete shared PVCs to repeat this exercise.
+For failures after a partial run, inspect whether the demo table, namespace, and catalog still exist. Continue from the next missing step after checking existing contents; do not blindly repeat inserts or recreate resources. Preserve the completed demo for lesson 17. Do not reset PostgreSQL, rerun bootstrap, or delete shared PVCs to repeat this exercise.
 
 References: [Polaris 1.7.0 S3 configuration](https://polaris.apache.org/releases/1.7.0/configuration/configuring-polaris-for-production/configuring-aws-s3-cloud-storage-specific/), [Iceberg metadata queries](https://iceberg.apache.org/docs/1.10.0/spark-queries/), and [Iceberg table specification](https://iceberg.apache.org/spec/).

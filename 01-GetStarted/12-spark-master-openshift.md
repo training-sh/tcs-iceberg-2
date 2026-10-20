@@ -148,6 +148,8 @@ oc -n bigdata rollout status statefulset/spark-worker --timeout=300s
 
 ### Optional: stop and start again
 
+Skip this stop while using Jupyter or continuing to lesson 17. Jupyter is a container in the master pod, so stopping the master also stops the notebook server.
+
 Stop these workloads without deleting their storage.
 
 ```bash
@@ -158,4 +160,26 @@ Set these workloads to one replica. This starts stopped workloads or keeps an ex
 
 ```bash
 oc -n bigdata scale statefulset/spark-master statefulset/spark-worker --replicas=1
+```
+
+## Watch Kubernetes logs
+
+`oc logs` is the Kubernetes equivalent of `docker logs`. Run follow commands in a separate VM terminal after `okd-env`. Press Ctrl+C to stop following; this does not stop the workload. A scaled-to-zero workload has no current pod logs.
+
+Follow the Spark master container logs.
+
+```bash
+oc -n bigdata logs -f spark-master-0 -c spark-master --tail=50 --timestamps
+```
+
+Read worker scheduling and executor startup logs.
+
+```bash
+oc -n bigdata logs spark-worker-0 -c spark-worker --since=10m --timestamps
+```
+
+Read Spark History Server logs.
+
+```bash
+oc -n bigdata logs spark-master-0 -c spark-history --tail=50 --timestamps
 ```

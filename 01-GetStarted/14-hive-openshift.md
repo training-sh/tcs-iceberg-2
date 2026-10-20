@@ -140,7 +140,19 @@ oc -n bigdata exec deployment/hiveserver2 -- beeline -u jdbc:hive2://hiveserver2
 
 ## 4. Read Hive and create an aggregate table with Spark
 
-Spark connects to the same Hive Metastore. The aggregate is saved as a Hive table and can then be queried from Beeline. Creation stops if `orderdb.order_aggregate` already exists; use a fresh table name in both the script and subsequent queries for a repeat run. Existing results are preserved.
+Spark connects to the same Hive Metastore. The aggregate is saved as a Hive table and can then be queried from Beeline. Creation stops if `orderdb.order_aggregate` already exists; use a fresh table name and output path in the script, and the same fresh name in subsequent queries, for a repeat run. Existing results are preserved.
+
+Prepare a dedicated HDFS output parent for the Spark aggregate. Spark runs as `spark`, while Hive's source files belong to the HDFS lab account.
+
+```bash
+oc -n bigdata exec namenode-0 -- hdfs dfs -mkdir -p /training/orders/spark-output
+```
+
+Assign only this output directory to Spark; leave existing source and warehouse permissions unchanged.
+
+```bash
+oc -n bigdata exec namenode-0 -- hdfs dfs -chown spark /training/orders/spark-output
+```
 
 Create a local working directory on the VM for lesson files.
 
@@ -157,14 +169,19 @@ from pyspark.sql import SparkSession
 spark = (SparkSession.builder
     .appName('hive-order-aggregate')
     .config('spark.sql.catalogImplementation', 'hive')
-    .config('hive.metastore.uris', 'thrift://hive-metastore:9083')
+    .config('spark.hadoop.hive.metastore.uris', 'thrift://hive-metastore:9083')
+    .config('spark.sql.catalog.spark_catalog', 'org.apache.iceberg.spark.SparkSessionCatalog')
+    .config('spark.sql.catalog.spark_catalog.type', 'hive')
+    .config('spark.sql.catalog.spark_catalog.uri', 'thrift://hive-metastore:9083')
     .enableHiveSupport()
     .getOrCreate())
 
 orders = spark.table('orderdb.orders')
 orders.show(truncate=False)
 aggregate = orders.groupBy('customer').sum('amount').withColumnRenamed('sum(amount)', 'total_amount')
-aggregate.write.format('hive').mode('errorifexists').saveAsTable('orderdb.order_aggregate')
+(aggregate.write.format('hive')
+    .option('path', 'hdfs://namenode:9000/training/orders/spark-output/order_aggregate')
+    .mode('errorifexists').saveAsTable('orderdb.order_aggregate'))
 spark.table('orderdb.order_aggregate').orderBy('customer').show(truncate=False)
 spark.stop()
 PY
@@ -241,4 +258,26 @@ Inspect the workload definitions and Services for these components.
 
 ```bash
 oc -n bigdata get deployment hive-metastore hiveserver2
+```
+
+## Watch Kubernetes logs
+
+`oc logs` is the Kubernetes equivalent of `docker logs`. Run follow commands in a separate VM terminal after `okd-env`. Press Ctrl+C to stop following; this does not stop the workload. A scaled-to-zero workload has no current pod logs.
+
+Follow Hive Metastore logs to inspect catalog requests.
+
+```bash
+oc -n bigdata logs -f deployment/hive-metastore --tail=50 --timestamps
+```
+
+Read HiveServer2 logs while that optional service is running.
+
+```bash
+oc -n bigdata logs deployment/hiveserver2 --since=10m --timestamps
+```
+
+Read NameNode logs for HDFS access errors.
+
+```bash
+oc -n bigdata logs namenode-0 --tail=50 --timestamps
 ```

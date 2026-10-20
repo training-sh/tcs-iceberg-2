@@ -33,6 +33,8 @@ Continue with [01 - Getting started](01-GetStarted/README.md):
 5. [14 - Hive](01-GetStarted/14-hive-openshift.md)
 6. [15 - SeaweedFS S3](01-GetStarted/15-seaweedfs.md)
 7. [16 - Polaris and Iceberg](01-GetStarted/16-polaris.md)
+8. [17-0 - Jupyter operations](01-GetStarted/17-0-Jupyter.md)
+9. [17-1 - PySpark integration notebook](01-GetStarted/17-1-pypark.ipynb)
 
 ## Reference presentation
 
