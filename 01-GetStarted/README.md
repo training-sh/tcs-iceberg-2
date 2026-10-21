@@ -19,7 +19,7 @@ Read these Markdown guides in order and run commands one at a time, checking eac
 6. [15-seaweedfs.md](15-seaweedfs.md) — S3 buckets and objects, uploads, downloads, container shells, admin UI and temporary demo cleanup.
 7. [16-polaris.md](16-polaris.md) — create an S3-backed Polaris catalog and Iceberg table, inspect manifests and snapshots, and retain the demo for lesson 17.
 8. [17-0-Jupyter.md](17-0-Jupyter.md) — start Jupyter, use persistent `/workspace/notebooks`, forward UIs, inspect status and Kubernetes logs, and save directly in JupyterLab.
-9. [17-1-pypark.ipynb](17-1-pypark.ipynb) — run PySpark across Polaris, Hive, HDFS, Iceberg catalogs, and S3 using the retained lesson 16 table.
+9. [17-1-pyspark.ipynb](17-1-pyspark.ipynb) — run PySpark across Polaris, Hive, HDFS, Iceberg catalogs, and S3 using the retained lesson 16 table.
 
 Each step explains its purpose before showing a command. Run the fenced Bash commands in the VM terminal because the in-cluster Jupyter container does not include the `oc` administration client. Browser links use only `127.0.0.1`.
 

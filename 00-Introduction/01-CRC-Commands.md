@@ -232,7 +232,7 @@ oc version
 
 ## 12. Permanent PATH and cloned-VM session configuration
 
-Use the [three `.bashrc` additions and validations](../00-bashrc.md#three-separate-additions-to-bashrc). They preserve existing PATH entries, add CRC and `oc`, and check the user runtime directory and D-Bus socket before `systemctl --user daemon-reload`. Do not append another unmarked PATH block.
+Use the [full `.bashrc` replacement and validations](../00-bashrc.md#step-1-replace-the-entire-bashrc). They preserve existing PATH entries, add CRC and `oc`, and check the user runtime directory and D-Bus socket before `systemctl --user daemon-reload`. Do not append another unmarked PATH block.
 
 ```bash
 # Check syntax before loading your existing shell configuration.

@@ -1,6 +1,6 @@
 # JupyterLab: launch, storage, access, and logs
 
-This guide contains terminal commands only. The Python exercises are in [17-1-pypark.ipynb](17-1-pypark.ipynb). Complete [16 - Polaris](16-polaris.md) first and retain its `demo_catalog_temp.demo_database_temp.demo_table_temp` table and `demo-catalog-temp` S3 bucket.
+This guide contains terminal commands only. The Python exercises are in [17-1-pyspark.ipynb](17-1-pyspark.ipynb). Complete [16 - Polaris](16-polaris.md) first and retain its `demo_catalog_temp.demo_database_temp.demo_table_temp` table and `demo-catalog-temp` S3 bucket.
 
 Run one command at a time in the Linux VM terminal. Open browser URLs inside the VM through RDP. The notebook kernel connects directly to cluster Services; web port-forwards are only for browser access.
 
@@ -108,10 +108,10 @@ oc -n bigdata exec namenode-0 -- hdfs dfs -ls -d /training/notebook-demo
 
 | Location | Path | Meaning |
 |---|---|---|
-| Course source on Windows | `C:\Course\DataEng\tcs\tcs-iceberg-2\01-GetStarted\17-1-pypark.ipynb` | Versioned notebook source |
+| Course source on Windows | `C:\Course\DataEng\tcs\tcs-iceberg-2\01-GetStarted\17-1-pyspark.ipynb` | Versioned notebook source |
 | Running Jupyter home | `/workspace` | Server root and notebook kernel's `$HOME` |
 | Jupyter notebook directory | `/workspace/notebooks` | The only notebook working directory |
-| Browser path | `notebooks/17-1-pypark.ipynb` | Path relative to Jupyter's root |
+| Browser path | `notebooks/17-1-pyspark.ipynb` | Path relative to Jupyter's root |
 | Kubernetes storage | PVC `spark-notebooks`, mounted at `/workspace` | Survives pod replacement; deleting the PVC destroys its contents |
 
 Use **`/workspace/notebooks` as the only notebook working directory**. Open, edit, execute, and save notebooks from JupyterLab there. The Windows repository file is the course template; no separate notebook directory under the VM user's home is needed. No pod or server restart is needed to add a notebook file.
@@ -166,13 +166,13 @@ Create the persistent notebook directory if it is missing. This directory is ins
 oc -n bigdata exec spark-master-0 -c jupyter -- mkdir -p /workspace/notebooks
 ```
 
-Inspect its contents. The prepared training VM already has `17-1-pypark.ipynb` and `17-1-pypark-executed.ipynb` here; open either in JupyterLab without copying it elsewhere.
+Inspect its contents. The prepared training VM already has `17-1-pyspark.ipynb` and `17-1-pyspark-executed.ipynb` here; open either in JupyterLab without copying it elsewhere.
 
 ```bash
 oc -n bigdata exec spark-master-0 -c jupyter -- ls -lh /workspace/notebooks
 ```
 
-For a fresh deployment, first open JupyterLab using section 5. In the file browser, open `notebooks`, click **Upload Files**, and select `17-1-pypark.ipynb` from this repository on the computer running your browser. With the browser inside the VM, make the source file available to that browser using your normal file transfer method. Upload directly into the Jupyter `notebooks` folder; do not create a second working directory on the VM. Do not replace an existing notebook containing edits you want to keep.
+For a fresh deployment, first open JupyterLab using section 5. In the file browser, open `notebooks`, click **Upload Files**, and select `17-1-pyspark.ipynb` from this repository on the computer running your browser. With the browser inside the VM, make the source file available to that browser using your normal file transfer method. Upload directly into the Jupyter `notebooks` folder; do not create a second working directory on the VM. Do not replace an existing notebook containing edits you want to keep.
 
 ## 5. Inspect Service ports and forward JupyterLab
 
@@ -201,7 +201,7 @@ In a separate VM terminal, run `okd-env`, then start the notebook forward and le
 oc -n bigdata port-forward --address=127.0.0.1 service/spark-master 18888:8888
 ```
 
-Open [JupyterLab](http://127.0.0.1:18888/lab?token=team1234) in the VM browser. The token is **`team1234`**; no separate username/password is required. Navigate to `notebooks`, then open `17-1-pypark.ipynb`. Its direct URL is [open the PySpark notebook](http://127.0.0.1:18888/lab/tree/notebooks/17-1-pypark.ipynb?token=team1234).
+Open [JupyterLab](http://127.0.0.1:18888/lab?token=team1234) in the VM browser. The token is **`team1234`**; no separate username/password is required. Navigate to `notebooks`, then open `17-1-pyspark.ipynb`. Its direct URL is [open the PySpark notebook](http://127.0.0.1:18888/lab/tree/notebooks/17-1-pyspark.ipynb?token=team1234).
 
 Choose the **Python 3** kernel and run cells from top to bottom. The first cells show resolved connections and verify lesson 16's retained data. Follow the notebook instructions if a prerequisite is missing. Save the notebook after the run. Shut down a previous Spark notebook kernel before starting another to avoid competing for the single worker.
 
@@ -285,7 +285,7 @@ oc -n bigdata logs spark-master-0 -c jupyter --previous --tail=50
 
 ## 8. Save in JupyterLab
 
-Use **File > Save Notebook** or Ctrl+S. Changes and cell outputs are saved directly to `/workspace/notebooks/17-1-pypark.ipynb` on the PVC. To retain a separate result file in the same directory, use **Save Notebook As** and choose another filename there. The prepared VM also contains `17-1-pypark-executed.ipynb`, with the verified run's results.
+Use **File > Save Notebook** or Ctrl+S. Changes and cell outputs are saved directly to `/workspace/notebooks/17-1-pyspark.ipynb` on the PVC. To retain a separate result file in the same directory, use **Save Notebook As** and choose another filename there. The prepared VM also contains `17-1-pyspark-executed.ipynb`, with the verified run's results.
 
 The notebook saves its retained table names and storage paths under `/workspace/notebooks/runs`. All notebook work stays under `/workspace/notebooks`; no host-side synchronization step is required.
 

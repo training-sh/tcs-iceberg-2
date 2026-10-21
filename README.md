@@ -18,7 +18,7 @@ https://codepad.pro/pad/IBd6pJ_iW7VX
 
 Start with [00 - Introduction](00-Introduction/README.md), in this order:
 
-1. [00 - Bash configuration](00-bashrc.md): shell additions and validation; apply after CRC installation.
+1. [00 - Bash configuration](00-bashrc.md): full cloned-VM shell configuration and validation; apply after CRC installation.
 2. [00 - Installation](00-Introduction/00-Installation.md): CRC installation and cluster operations.
 3. [01 - CRC commands](00-Introduction/01-CRC-Commands.md): cluster lifecycle and configuration.
 4. [02 - OpenShift oc commands](00-Introduction/02-OC-Commands.md): workloads and troubleshooting.
@@ -34,7 +34,7 @@ Continue with [01 - Getting started](01-GetStarted/README.md):
 6. [15 - SeaweedFS S3](01-GetStarted/15-seaweedfs.md)
 7. [16 - Polaris and Iceberg](01-GetStarted/16-polaris.md)
 8. [17-0 - Jupyter operations](01-GetStarted/17-0-Jupyter.md)
-9. [17-1 - PySpark integration notebook](01-GetStarted/17-1-pypark.ipynb)
+9. [17-1 - PySpark integration notebook](01-GetStarted/17-1-pyspark.ipynb)
 
 ## Reference presentation
 

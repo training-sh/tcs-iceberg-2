@@ -1,6 +1,6 @@
 # OKD on CRC: installation and cluster operations
 
-This lab runs the community OKD distribution in a CodeReady Containers (CRC) virtual machine. **CRC installation and initial preparation are already complete on the supplied training VM. No installation is needed; the host requirements and installation instructions below are for information only.** The remaining setup is to complete the [three `.bashrc` additions and validations](../00-bashrc.md) before using the startup helpers. Run selected operational shell blocks in a Bash terminal on the Linux VM; diagnostic and workload operations are separate examples, not a script to run from top to bottom. Commands that begin with `sudo` require the VM user's sudo access.
+This lab runs the community OKD distribution in a CodeReady Containers (CRC) virtual machine. **CRC installation and initial preparation are already complete on the supplied training VM. No installation is needed; the host requirements and installation instructions below are for information only.** The remaining setup is to complete the [full `.bashrc` replacement and validations](../00-bashrc.md) before using the startup helpers. Run selected operational shell blocks in a Bash terminal on the Linux VM; diagnostic and workload operations are separate examples, not a script to run from top to bottom. Commands that begin with `sudo` require the VM user's sudo access.
 
 ## Software and data locations
 
@@ -84,7 +84,7 @@ crc config view
 After installing the [`.bashrc` functions](../00-bashrc.md), `okd-start` starts CRC and prepares `oc`. The first start can take several minutes.
 
 ```bash
-# First apply all three additions in 00-bashrc.md and load .bashrc.
+# First paste the full replacement block and session additions from 00-bashrc.md and load .bashrc.
 # This starts CRC and refreshes the stable administrator kubeconfig.
 okd-start && oc whoami && oc get nodes
 ```
@@ -93,7 +93,7 @@ The [`.bashrc` functions](../00-bashrc.md) load CRC's `oc` client and copy CRC's
 
 ## Configure `.bashrc`
 
-Follow [00 - Bash configuration](../00-bashrc.md) to back up your file, apply the three additions, and run all three validations. That guide contains the complete `tee`/heredoc blocks for OKD helpers, CRC client PATH, and user-session variables, including cloned-VM recovery.
+Follow [00 - Bash configuration](../00-bashrc.md) to back up your file, paste the full replacement block, append the remaining session setup, and run all three validations. That guide provides the copyable full-file replacement block and append-only PATH/session blocks, including cloned-VM recovery.
 
 The helpers use `KUBECONFIG="$HOME/.kube/crc-admin.kubeconfig"`. `okd-env` refreshes this copy from CRC and checks authentication; sourcing `.bashrc` alone does not create it.
 
@@ -164,7 +164,7 @@ sudo virsh -c qemu:///system domstate crc
 ```
 
 ```bash
-# First apply all three additions in 00-bashrc.md and load .bashrc.
+# First paste the full replacement block and session additions from 00-bashrc.md and load .bashrc.
 # This starts CRC and refreshes the stable administrator kubeconfig.
 okd-start && oc whoami && oc get nodes
 ```

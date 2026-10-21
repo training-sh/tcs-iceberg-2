@@ -475,7 +475,7 @@ In the verified run, the two appends produced nine objects: two Parquet data fil
 
 ## 11. Keep the demo for the Jupyter notebook
 
-**Do not drop the table, namespace, catalog, or bucket.** [17-0-Jupyter.md](17-0-Jupyter.md) explains how to open [17-1-pypark.ipynb](17-1-pypark.ipynb), which reads this table, its three rows, and its snapshot history before adding separate examples.
+**Do not drop the table, namespace, catalog, or bucket.** [17-0-Jupyter.md](17-0-Jupyter.md) explains how to open [17-1-pyspark.ipynb](17-1-pyspark.ipynb), which reads this table, its three rows, and its snapshot history before adding separate examples.
 
 In terminal D's PySpark prompt, release this Spark session. Stopping Spark does not remove catalog registrations or stored data.
 
