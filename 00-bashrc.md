@@ -429,6 +429,25 @@ Expect the `bigdata` project and one `Ready` node after startup settles. A worki
 
 Systemd references: [pam_systemd session/runtime directory](https://www.freedesktop.org/software/systemd/man/251/pam_systemd.html), [systemctl daemon-reload](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html), [loginctl lingering](https://www.freedesktop.org/software/systemd/man/latest/loginctl.html).
 
+
+# Host name mapping to resolve testing domain
+
+
+```bash
+sudo tee -a /etc/hosts >/dev/null <<'EOF'
+127.0.0.1 api.crc.testing
+127.0.0.1 console-openshift-console.apps-crc.testing
+EOF
+```
+
+```bash
+grep 'crc.testing' /etc/hosts
+getent hosts api.crc.testing
+getent hosts console-openshift-console.apps-crc.testing
+```
+
+
+
 ## Environment settings checked on the instructor VM
 
 All configured Java, Hadoop, Hive, Spark, Kafka, Python virtual-environment, and CRC paths existed when checked. The replacement retains those settings; no extra global Hadoop or Hive variables are required for the Kubernetes lessons.
