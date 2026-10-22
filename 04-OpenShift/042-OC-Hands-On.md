@@ -636,6 +636,45 @@ oc -n project-demo get events --sort-by=.metadata.creationTimestamp
 
 `log-collector` appears as a Deployment and Pod. It has no Kubernetes Service because it does not accept network connections.
 
+### Inspect the same resources in the OpenShift web console
+
+Show the console URL:
+
+```bash
+crc console --url
+```
+
+Retrieve it through the API and open it in the Ubuntu browser:
+
+```bash
+CONSOLE_URL=$(oc get consoles.config.openshift.io cluster \
+  -o jsonpath='{.status.consoleURL}')
+printf '%s\n' "$CONSOLE_URL"
+xdg-open "$CONSOLE_URL"
+```
+
+The configured console URL is `https://console-openshift-console.apps-crc.testing`. Open it inside Ubuntu, where CRC's DNS and networking are configured.
+
+If sign-in is required, display the CRC login instructions:
+
+```bash
+crc console --credentials
+```
+
+Select **project-demo** in the console's project selector. The browser's selected project is independent of the terminal's context.
+
+Inspect the same objects shown by `oc`:
+
+| Console resource | What to inspect |
+|---|---|
+| Pods | Status, containers, events and logs for FastAPI, PostgreSQL, NGINX and log-collector |
+| Deployments / StatefulSets | Replica counts, Pod templates and images |
+| Services | Selectors and ports for FastAPI, PostgreSQL and NGINX |
+| PersistentVolumeClaims | Database and shared-log claims and their bound volumes |
+| ConfigMaps / Secrets | Configuration keys and credential references |
+
+Inspect these resources before the cleanup section; deleting the project removes them from the console too. Console and login pages were checked on the configured VM and returned HTTP `200` with certificate verification enabled.
+
 ---
 
 ## 14 · Open FastAPI and NGINX in the Ubuntu browser
