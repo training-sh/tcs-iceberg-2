@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">Desired state is a continuing instruction</title><desc id="desc">Example: keep three application Pods available, even as individual Pods disappear.</desc>
+<rect width="1200" height="720" fill="#f8fafc"/>
+<text x="50" y="47.3" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" text-anchor="start">KUBERNETES / VISUAL GUIDE</text>
+<text x="50" y="92.88" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="34" font-weight="700" text-anchor="start">Desired state is a continuing instruction</text>
+<text x="50" y="131.57999999999998" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Example: keep three application Pods available, even as individual Pods disappear.</text>
+<rect x="50" y="185" width="300" height="135" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="68" y="220.04" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Deployment spec</text>
+<text x="68" y="252.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">replicas: 3</text>
+<text x="68" y="280.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Image + Pod template</text>
+<rect x="460" y="185" width="300" height="135" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="478" y="220.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Controller + ReplicaSet</text>
+<text x="478" y="252.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Compare spec with current state</text>
+<text x="478" y="280.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Create replacement Pods</text>
+<polyline points="350,255 460,255" fill="none" stroke="#526581" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="460.0,255.0 450.2,260.1 450.2,249.9" fill="#526581"/>
+<rect x="50" y="385" width="280" height="95" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="68" y="420.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Pod A: ready</text>
+<rect x="460" y="385" width="280" height="95" rx="16" fill="#fff6e7" stroke="#ad6200" stroke-width="2"/>
+<text x="478" y="420.04" fill="#ad6200" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Pod B: lost</text>
+<rect x="870" y="385" width="280" height="95" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="888" y="420.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Pod C: ready</text>
+<polyline points="610,385 610,320" fill="none" stroke="#7047bd" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="610.0,320.0 615.1,329.8 604.9,329.8" fill="#7047bd"/>
+<rect x="460" y="530" width="300" height="90" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="478" y="565.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">New Pod B2: ready</text>
+<polyline points="460,285 405,285 405,575 460,575" fill="none" stroke="#087f5b" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="460.0,575.0 450.2,580.1 450.2,569.9" fill="#087f5b"/>
+<text x="810" y="569.76" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">New Pod, possibly a new node/IP</text>
+<rect x="50" y="659" width="1100" height="42" rx="10" fill="#eaf0f7" stroke="#eaf0f7" stroke-width="2"/>
+<text x="70" y="682.94" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Container restart and Pod replacement differ. Recovery still needs healthy capacity, networking and accessible data.</text>
+</svg>

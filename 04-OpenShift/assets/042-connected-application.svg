@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">A database request and a shared log file</title><desc id="desc">project-demo: separate Pods, stable Services and one shared log volume.</desc>
+<rect width="1440" height="810" fill="#f7f9fc"/>
+<rect width="1440" height="9" fill="#c9190b"/>
+<text x="52" y="44" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c9190b">OPENSHIFT</text>
+<text x="52" y="90" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#182536">A database request and a shared log file</text>
+<text x="52" y="144" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#526174">project-demo: separate Pods, stable Services and one shared log volume.</text>
+<rect x="55" y="225" width="390" height="170" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="56" y="241" width="5" height="138" fill="#2266a5"/>
+<text x="79" y="264" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">Ubuntu browser</text>
+<text x="79" y="302" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Guacamole desktop</text>
+<text x="79" y="334" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">GET /db through port-forward</text>
+<text x="79" y="366" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">FastAPI Service :8000</text>
+<rect x="525" y="225" width="390" height="170" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="526" y="241" width="5" height="138" fill="#c9190b"/>
+<text x="549" y="264" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">FastAPI Pod</text>
+<text x="549" y="302" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Custom Python image</text>
+<text x="549" y="334" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">ConfigMap + Secret → env</text>
+<text x="549" y="366" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Run SELECT; write /logs/app.log</text>
+<rect x="995" y="225" width="390" height="170" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="996" y="241" width="5" height="138" fill="#23785a"/>
+<text x="1019" y="264" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">PostgreSQL Pod</text>
+<text x="1019" y="302" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Service: postgresql :5432</text>
+<text x="1019" y="334" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">StatefulSet: postgresql-0</text>
+<text x="1019" y="366" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Separate database PVC</text>
+<path d="M450 310 L515 310" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M504 303 L515 310 L504 317" fill="none" stroke="#526174" stroke-width="3"/>
+<path d="M920 310 L985 310" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M974 303 L985 310 L974 317" fill="none" stroke="#526174" stroke-width="3"/>
+<rect x="525" y="480" width="390" height="170" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="526" y="496" width="5" height="138" fill="#23785a"/>
+<text x="549" y="519" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">shared-logs PVC</text>
+<text x="549" y="557" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">FastAPI mounts read-write</text>
+<text x="549" y="589" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Collector mounts read-only</text>
+<text x="549" y="621" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Both Pods on the same node</text>
+<path d="M720 400 L720 470" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M713 459 L720 470 L727 459" fill="none" stroke="#526174" stroke-width="3"/>
+<rect x="995" y="480" width="390" height="170" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="996" y="496" width="5" height="138" fill="#2266a5"/>
+<text x="1019" y="519" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">log-collector Pod</text>
+<text x="1019" y="557" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">tail -F /logs/app.log</text>
+<text x="1019" y="589" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">File contents → stdout</text>
+<text x="1019" y="621" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Inspect with oc logs</text>
+<path d="M920 565 L985 565" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M974 558 L985 565 L974 572" fill="none" stroke="#526174" stroke-width="3"/>
+<rect x="55" y="480" width="390" height="170" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="56" y="496" width="5" height="138" fill="#c9190b"/>
+<text x="79" y="519" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">NGINX image example</text>
+<text x="79" y="557" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">FROM nginx:alpine</text>
+<text x="79" y="589" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">COPY index.html</text>
+<text x="79" y="621" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Independent static page</text>
+<text x="52" y="768" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#526174">Build both custom images with oc. Inspect Pods and Services; scale the stateless NGINX Deployment.</text>
+</svg>

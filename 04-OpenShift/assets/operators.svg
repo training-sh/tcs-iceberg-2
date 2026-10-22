@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">Operators manage the platform continuously</title><desc id="desc">An Operator is a controller with knowledge of how to run a particular system.</desc>
+<rect width="1440" height="810" fill="#f7f9fc"/>
+<rect width="1440" height="9" fill="#c9190b"/>
+<text x="52" y="44" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c9190b">OPENSHIFT</text>
+<text x="52" y="90" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#182536">Operators manage the platform continuously</text>
+<text x="52" y="144" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#526174">An Operator is a controller with knowledge of how to run a particular system.</text>
+<rect x="55" y="245" width="420" height="180" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="56" y="261" width="5" height="148" fill="#c9190b"/>
+<text x="79" y="284" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">Desired configuration</text>
+<text x="79" y="322" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Custom resource / API object</text>
+<text x="79" y="354" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Example: IngressController</text>
+<text x="79" y="386" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Replicas, domain, TLS settings</text>
+<rect x="510" y="245" width="420" height="180" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="511" y="261" width="5" height="148" fill="#2266a5"/>
+<text x="534" y="284" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">Operator</text>
+<text x="534" y="322" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Watch current state</text>
+<text x="534" y="354" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Create or update resources</text>
+<text x="534" y="386" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Report health and progress</text>
+<rect x="965" y="245" width="420" height="180" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="966" y="261" width="5" height="148" fill="#23785a"/>
+<text x="989" y="284" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Managed components</text>
+<text x="989" y="322" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Deployments + Pods</text>
+<text x="989" y="354" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Services + certificates</text>
+<text x="989" y="386" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Configuration</text>
+<path d="M480 335 L500 335" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M489 328 L500 335 L489 342" fill="none" stroke="#526174" stroke-width="3"/>
+<path d="M935 335 L955 335" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M944 328 L955 335 L944 342" fill="none" stroke="#526174" stroke-width="3"/>
+<rect x="55" y="500" width="650" height="155" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="56" y="516" width="5" height="123" fill="#c9190b"/>
+<text x="79" y="539" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">Cluster Version Operator</text>
+<text x="79" y="577" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Coordinates the platform release payload</text>
+<text x="79" y="609" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Works with individual Cluster Operators</text>
+<rect x="735" y="500" width="650" height="155" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="736" y="516" width="5" height="123" fill="#23785a"/>
+<text x="759" y="539" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Machine Config Operator</text>
+<text x="759" y="577" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Manages supported node OS configuration</text>
+<text x="759" y="609" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Coordinates required node changes and reboots</text>
+<text x="52" y="768" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#526174">Configure the supported API object. Manual edits to generated resources can be overwritten.</text>
+</svg>

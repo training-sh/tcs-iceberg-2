@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">A production cluster spans several machines</title><desc id="desc">Example: three control-plane nodes and three workers across three failure zones.</desc>
+<rect width="1440" height="810" fill="#f7f9fc"/>
+<rect width="1440" height="9" fill="#c9190b"/>
+<text x="52" y="44" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c9190b">OPENSHIFT</text>
+<text x="52" y="90" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#182536">A production cluster spans several machines</text>
+<text x="52" y="144" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#526174">Example: three control-plane nodes and three workers across three failure zones.</text>
+<text x="65" y="222" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#526174">Zone A</text>
+<rect x="55" y="250" width="420" height="165" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="56" y="266" width="5" height="133" fill="#c9190b"/>
+<text x="79" y="289" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">Control plane 1</text>
+<text x="79" y="327" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">API server + controllers</text>
+<text x="79" y="359" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Scheduler + etcd</text>
+<text x="79" y="391" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CoreOS + kubelet + CRI-O</text>
+<rect x="55" y="455" width="420" height="190" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="56" y="471" width="5" height="158" fill="#23785a"/>
+<text x="79" y="494" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Worker 1</text>
+<text x="79" y="532" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Application Pods</text>
+<text x="79" y="564" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Router Pods where configured</text>
+<text x="79" y="596" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CoreOS + kubelet + CRI-O</text>
+<path d="M265 420 L265 449" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M258 438 L265 449 L272 438" fill="none" stroke="#526174" stroke-width="3"/>
+<text x="520" y="222" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#526174">Zone B</text>
+<rect x="510" y="250" width="420" height="165" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="511" y="266" width="5" height="133" fill="#c9190b"/>
+<text x="534" y="289" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">Control plane 2</text>
+<text x="534" y="327" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">API server + controllers</text>
+<text x="534" y="359" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Scheduler + etcd</text>
+<text x="534" y="391" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CoreOS + kubelet + CRI-O</text>
+<rect x="510" y="455" width="420" height="190" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="511" y="471" width="5" height="158" fill="#23785a"/>
+<text x="534" y="494" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Worker 2</text>
+<text x="534" y="532" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Application Pods</text>
+<text x="534" y="564" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Router Pods where configured</text>
+<text x="534" y="596" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CoreOS + kubelet + CRI-O</text>
+<path d="M720 420 L720 449" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M713 438 L720 449 L727 438" fill="none" stroke="#526174" stroke-width="3"/>
+<text x="975" y="222" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#526174">Zone C</text>
+<rect x="965" y="250" width="420" height="165" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="966" y="266" width="5" height="133" fill="#c9190b"/>
+<text x="989" y="289" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">Control plane 3</text>
+<text x="989" y="327" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">API server + controllers</text>
+<text x="989" y="359" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Scheduler + etcd</text>
+<text x="989" y="391" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CoreOS + kubelet + CRI-O</text>
+<rect x="965" y="455" width="420" height="190" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="966" y="471" width="5" height="158" fill="#23785a"/>
+<text x="989" y="494" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Worker 3</text>
+<text x="989" y="532" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Application Pods</text>
+<text x="989" y="564" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Router Pods where configured</text>
+<text x="989" y="596" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CoreOS + kubelet + CRI-O</text>
+<path d="M1175 420 L1175 449" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M1168 438 L1175 449 L1182 438" fill="none" stroke="#526174" stroke-width="3"/>
+<text x="52" y="768" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#526174">Place replicas across nodes and zones. Shared storage and load balancers also need resilient designs.</text>
+</svg>

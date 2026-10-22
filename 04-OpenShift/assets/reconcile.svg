@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">A manifest becomes running containers</title><desc id="desc">The API stores intent; controllers and node agents work continuously to satisfy it.</desc>
+<rect width="1440" height="810" fill="#f7f9fc"/>
+<rect width="1440" height="9" fill="#c9190b"/>
+<text x="52" y="44" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c9190b">OPENSHIFT</text>
+<text x="52" y="90" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#182536">A manifest becomes running containers</text>
+<text x="52" y="144" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#526174">The API stores intent; controllers and node agents work continuously to satisfy it.</text>
+<rect x="55" y="250" width="420" height="150" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="56" y="266" width="5" height="118" fill="#c9190b"/>
+<text x="79" y="289" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">1  Apply</text>
+<text x="79" y="327" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">oc apply -f app.yaml</text>
+<text x="79" y="359" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Declare three replicas</text>
+<rect x="510" y="250" width="420" height="150" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="511" y="266" width="5" height="118" fill="#c9190b"/>
+<text x="534" y="289" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">2  API + etcd</text>
+<text x="534" y="327" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Authenticate and validate</text>
+<text x="534" y="359" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Persist desired state</text>
+<rect x="965" y="250" width="420" height="150" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="966" y="266" width="5" height="118" fill="#c9190b"/>
+<text x="989" y="289" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">3  Controllers</text>
+<text x="989" y="327" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Deployment → ReplicaSet</text>
+<text x="989" y="359" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Create the required Pods</text>
+<path d="M480 325 L500 325" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M489 318 L500 325 L489 332" fill="none" stroke="#526174" stroke-width="3"/>
+<path d="M935 325 L955 325" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M944 318 L955 325 L944 332" fill="none" stroke="#526174" stroke-width="3"/>
+<rect x="55" y="495" width="420" height="155" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="56" y="511" width="5" height="123" fill="#23785a"/>
+<text x="79" y="534" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">6  Reconcile again</text>
+<text x="79" y="572" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Replace lost Pods</text>
+<text x="79" y="604" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Readiness controls traffic</text>
+<rect x="510" y="495" width="420" height="155" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="511" y="511" width="5" height="123" fill="#23785a"/>
+<text x="534" y="534" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">5  kubelet + CRI-O</text>
+<text x="534" y="572" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Pull image; start containers</text>
+<text x="534" y="604" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Report status and health</text>
+<rect x="965" y="495" width="420" height="155" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="966" y="511" width="5" height="123" fill="#2266a5"/>
+<text x="989" y="534" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">4  Scheduler</text>
+<text x="989" y="572" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Find a suitable node</text>
+<text x="989" y="604" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Bind each pending Pod</text>
+<path d="M1175 405 L1175 485" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M1168 474 L1175 485 L1182 474" fill="none" stroke="#526174" stroke-width="3"/>
+<text x="70" y="706" font-family="Arial, sans-serif" font-size="23" font-weight="400" fill="#526174">Bottom row continues from right to left: schedule → start → observe and repair.</text>
+</svg>

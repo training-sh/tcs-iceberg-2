@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">One ecosystem, different distribution choices</title><desc id="desc">The distribution and release determine support, operating system and update paths.</desc>
+<rect width="1440" height="810" fill="#f7f9fc"/>
+<rect width="1440" height="9" fill="#c9190b"/>
+<text x="52" y="44" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c9190b">OPENSHIFT</text>
+<text x="52" y="90" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#182536">One ecosystem, different distribution choices</text>
+<text x="52" y="144" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#526174">The distribution and release determine support, operating system and update paths.</text>
+<rect x="55" y="245" width="420" height="350" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="56" y="261" width="5" height="318" fill="#2266a5"/>
+<text x="79" y="284" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">Kubernetes</text>
+<text x="79" y="322" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Upstream orchestration project</text>
+<text x="79" y="354" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Pods, Deployments and Services</text>
+<text x="79" y="386" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">APIs and extension mechanisms</text>
+<text x="79" y="418" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536"></text>
+<text x="79" y="450" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Foundation used by OpenShift</text>
+<rect x="510" y="245" width="420" height="350" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="511" y="261" width="5" height="318" fill="#23785a"/>
+<text x="534" y="284" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">OKD</text>
+<text x="534" y="322" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Community distribution</text>
+<text x="534" y="354" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">OpenShift platform components</text>
+<text x="534" y="386" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Community releases and support</text>
+<text x="534" y="418" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536"></text>
+<text x="534" y="450" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CoreOS variant is release-specific</text>
+<rect x="965" y="245" width="420" height="350" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="966" y="261" width="5" height="318" fill="#c9190b"/>
+<text x="989" y="284" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">Red Hat OpenShift</text>
+<text x="989" y="322" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Enterprise platform products</text>
+<text x="989" y="354" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Validated release lifecycle</text>
+<text x="989" y="386" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Red Hat support / subscription</text>
+<text x="989" y="418" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536"></text>
+<text x="989" y="450" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">OCP uses RHCOS nodes</text>
+<text x="52" y="768" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#526174">OKD is not a subscription-free copy of an identical OCP release. Check each distribution separately.</text>
+</svg>

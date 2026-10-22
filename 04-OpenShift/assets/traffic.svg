@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">How a browser reaches an application</title><desc id="desc">The application route and the Kubernetes API use separate entry points.</desc>
+<rect width="1440" height="810" fill="#f7f9fc"/>
+<rect width="1440" height="9" fill="#c9190b"/>
+<text x="52" y="44" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c9190b">OPENSHIFT</text>
+<text x="52" y="90" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#182536">How a browser reaches an application</text>
+<text x="52" y="144" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#526174">The application route and the Kubernetes API use separate entry points.</text>
+<rect x="55" y="260" width="420" height="175" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="56" y="276" width="5" height="143" fill="#23785a"/>
+<text x="79" y="299" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Browser</text>
+<text x="79" y="337" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">orders.apps.example</text>
+<text x="79" y="369" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">HTTPS :443</text>
+<rect x="510" y="260" width="420" height="175" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="511" y="276" width="5" height="143" fill="#23785a"/>
+<text x="534" y="299" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Ingress entry</text>
+<text x="534" y="337" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">External load balancer</text>
+<text x="534" y="369" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Router Pods / HAProxy</text>
+<rect x="965" y="260" width="420" height="175" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="966" y="276" width="5" height="143" fill="#23785a"/>
+<text x="989" y="299" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Ready Pod endpoints</text>
+<text x="989" y="337" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">orders Service selects Pods</text>
+<text x="989" y="369" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Router forwards to endpoints</text>
+<path d="M480 345 L500 345" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M489 338 L500 345 L489 352" fill="none" stroke="#526174" stroke-width="3"/>
+<path d="M935 345 L955 345" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M944 338 L955 345 L944 352" fill="none" stroke="#526174" stroke-width="3"/>
+<rect x="55" y="510" width="650" height="150" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="56" y="526" width="5" height="118" fill="#c9190b"/>
+<text x="79" y="549" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">Route configuration</text>
+<text x="79" y="587" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Hostname + TLS policy + target Service</text>
+<text x="79" y="619" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Service → EndpointSlices → ready Pod IPs</text>
+<rect x="735" y="510" width="650" height="150" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="736" y="526" width="5" height="118" fill="#2266a5"/>
+<text x="759" y="549" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">Management traffic</text>
+<text x="759" y="587" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">oc / kubectl → API endpoint :6443</text>
+<text x="759" y="619" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">API load balancer → control-plane API servers</text>
+<text x="52" y="768" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#526174">The Service defines the backend; router traffic commonly goes directly to selected Pod endpoints.</text>
+</svg>

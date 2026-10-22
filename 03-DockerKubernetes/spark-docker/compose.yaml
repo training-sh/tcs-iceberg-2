@@ -1,0 +1,42 @@
+name: day51-spark
+services:
+  spark-master:
+    build: .
+    image: day51-spark:3.5.9-java11
+    hostname: spark-master
+    init: true
+    command: ["master"]
+    environment:
+      SPARK_MASTER_HOST: spark-master
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:4040:4040"
+    volumes:
+      - spark-data:/opt/spark/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  spark-worker:
+    image: day51-spark:3.5.9-java11
+    hostname: spark-worker
+    init: true
+    command: ["worker"]
+    environment:
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_HOST: spark-worker
+      SPARK_WORKER_CORES: "2"
+      SPARK_WORKER_MEMORY: 2g
+    ports:
+      - "127.0.0.1:8081:8081"
+    volumes:
+      - spark-data:/opt/spark/data
+    depends_on:
+      spark-master:
+        condition: service_healthy
+
+volumes:
+  spark-data:

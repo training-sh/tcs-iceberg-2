@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">A node contains Pods; a Pod contains containers</title><desc id="desc">A project groups API resources. Its Pods can be scheduled on different nodes.</desc>
+<rect width="1440" height="810" fill="#f7f9fc"/>
+<rect width="1440" height="9" fill="#c9190b"/>
+<text x="52" y="44" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c9190b">OPENSHIFT</text>
+<text x="52" y="90" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#182536">A node contains Pods; a Pod contains containers</text>
+<text x="52" y="144" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#526174">A project groups API resources. Its Pods can be scheduled on different nodes.</text>
+<rect x="55" y="220" width="825" height="465" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="56" y="236" width="5" height="433" fill="#23785a"/>
+<text x="79" y="259" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Worker node</text>
+<rect x="90" y="295" width="350" height="210" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="91" y="311" width="5" height="178" fill="#2266a5"/>
+<text x="114" y="334" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">Pod: orders</text>
+<text x="114" y="372" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Application container</text>
+<text x="114" y="404" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Optional sidecar</text>
+<text x="114" y="436" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Shared network + volumes</text>
+<rect x="475" y="295" width="350" height="210" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="476" y="311" width="5" height="178" fill="#2266a5"/>
+<text x="499" y="334" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">Pod: inventory</text>
+<text x="499" y="372" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Application container</text>
+<text x="499" y="404" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Separate Pod IP</text>
+<text x="499" y="436" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Independent lifecycle</text>
+<rect x="90" y="545" width="735" height="105" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="91" y="561" width="5" height="73" fill="#23785a"/>
+<text x="114" y="584" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">CoreOS → kubelet → CRI-O</text>
+<text x="114" y="622" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Node services supervise container execution</text>
+<rect x="930" y="220" width="455" height="200" rx="14" fill="white" stroke="#c9190b" stroke-width="2"/>
+<rect x="931" y="236" width="5" height="168" fill="#c9190b"/>
+<text x="954" y="259" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#c9190b">Project: commerce</text>
+<text x="954" y="297" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Deployment + Service + Route</text>
+<text x="954" y="329" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">ConfigMaps + Secrets + PVCs</text>
+<text x="954" y="361" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">RBAC + quota + policy</text>
+<rect x="930" y="460" width="455" height="225" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="931" y="476" width="5" height="193" fill="#23785a"/>
+<text x="954" y="499" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">Persistent storage</text>
+<text x="954" y="537" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">PVC requests storage</text>
+<text x="954" y="569" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">PV represents provisioned storage</text>
+<text x="954" y="601" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CSI driver connects the backend</text>
+<text x="954" y="633" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Volume mounted into the Pod</text>
+<text x="52" y="768" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#526174">Deleting a Pod removes its writable container layer; persistent volume data follows its storage policy.</text>
+</svg>

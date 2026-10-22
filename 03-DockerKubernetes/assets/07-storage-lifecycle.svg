@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">A Pod asks for storage through a claim</title><desc id="desc">PVC = request. PV = storage resource. StorageClass = provisioning policy.</desc>
+<rect width="1200" height="720" fill="#f8fafc"/>
+<text x="50" y="47.3" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" text-anchor="start">KUBERNETES / VISUAL GUIDE</text>
+<text x="50" y="92.88" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="34" font-weight="700" text-anchor="start">A Pod asks for storage through a claim</text>
+<text x="50" y="131.57999999999998" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">PVC = request. PV = storage resource. StorageClass = provisioning policy.</text>
+<rect x="50" y="185" width="300" height="145" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="68" y="220.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Pod</text>
+<text x="68" y="253.57999999999998" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Application mount: /data</text>
+<text x="68" y="281.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">References a claim by name</text>
+<rect x="450" y="185" width="280" height="145" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="468" y="220.04" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">PVC</text>
+<text x="468" y="253.57999999999998" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Example: 5 GiB, RWO</text>
+<text x="468" y="281.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">A namespace-scoped claim</text>
+<rect x="850" y="185" width="300" height="145" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="868" y="220.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">PV</text>
+<text x="868" y="253.57999999999998" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Cluster-scoped resource</text>
+<text x="868" y="281.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Describes backing storage</text>
+<polyline points="350,260 450,260" fill="none" stroke="#526581" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="450.0,260.0 440.2,265.1 440.2,254.9" fill="#526581"/>
+<polyline points="730,260 850,260" fill="none" stroke="#526581" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="850.0,260.0 840.2,265.1 840.2,254.9" fill="#526581"/>
+<text x="365" y="238.94" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">request</text>
+<text x="775" y="238.94" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">bind</text>
+<rect x="450" y="430" width="280" height="155" rx="16" fill="#fff6e7" stroke="#ad6200" stroke-width="2"/>
+<text x="468" y="465.04" fill="#ad6200" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">StorageClass</text>
+<text x="468" y="497.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Policy + provisioner / CSI</text>
+<text x="468" y="525.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Can allocate PV + volume</text>
+<rect x="850" y="430" width="300" height="155" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="868" y="465.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Backing storage</text>
+<text x="868" y="497.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Local disk or cloud volume</text>
+<text x="868" y="525.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">The actual application bytes</text>
+<polyline points="730,500 850,500" fill="none" stroke="#ad6200" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="850.0,500.0 840.2,505.1 840.2,494.9" fill="#ad6200"/>
+<polyline points="1000,430 1000,330" fill="none" stroke="#7047bd" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="1000.0,330.0 1005.1,339.8 994.9,339.8" fill="#7047bd"/>
+<polyline points="200,330 200,615 1000,615 1000,585" fill="none" stroke="#087f5b" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="1000.0,585.0 1005.1,594.8 994.9,594.8" fill="#087f5b"/>
+<text x="50" y="467.76" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start">Mounted volume I/O</text>
+<text x="50" y="497.76" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">PVC is not a data proxy.</text>
+<rect x="50" y="659" width="1100" height="42" rx="10" fill="#eaf0f7" stroke="#eaf0f7" stroke-width="2"/>
+<text x="70" y="682.94" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Deleting a Pod, deleting a claim and deleting a local cluster have different effects. Persistence is not a backup.</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">A Service gives changing Pods a stable address</title><desc id="desc">Selectors choose the Pods. Readiness determines which endpoints receive ordinary traffic.</desc>
+<rect width="1200" height="720" fill="#f8fafc"/>
+<text x="50" y="47.3" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" text-anchor="start">KUBERNETES / VISUAL GUIDE</text>
+<text x="50" y="92.88" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="34" font-weight="700" text-anchor="start">A Service gives changing Pods a stable address</text>
+<text x="50" y="131.57999999999998" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Selectors choose the Pods. Readiness determines which endpoints receive ordinary traffic.</text>
+<rect x="50" y="245" width="300" height="170" rx="16" fill="#fff6e7" stroke="#ad6200" stroke-width="2"/>
+<text x="68" y="280.04" fill="#ad6200" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">External entry</text>
+<text x="68" y="312.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Browser / client</text>
+<text x="68" y="340.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Ingress or Gateway controller</text>
+<text x="68" y="368.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">with a reachable entry point</text>
+<rect x="450" y="245" width="280" height="170" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="468" y="280.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Service: web</text>
+<text x="468" y="311.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Stable DNS + virtual IP</text>
+<text x="468" y="339.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">port 80 -&gt; targetPort 80</text>
+<text x="468" y="367.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">selector: app=web</text>
+<rect x="895" y="185" width="255" height="115" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="913" y="220.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Ready Pod A</text>
+<text x="913" y="253.57999999999998" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">label: app=web</text>
+<rect x="895" y="390" width="255" height="115" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="913" y="425.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Ready Pod B</text>
+<text x="913" y="458.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">label: app=web</text>
+<polyline points="350,330 450,330" fill="none" stroke="#526581" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="450.0,330.0 440.2,335.1 440.2,324.9" fill="#526581"/>
+<polyline points="730,330 805,330 805,240 895,240" fill="none" stroke="#087f5b" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="895.0,240.0 885.2,245.1 885.2,234.9" fill="#087f5b"/>
+<polyline points="805,330 805,447 895,447" fill="none" stroke="#087f5b" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="895.0,447.0 885.2,452.1 885.2,441.9" fill="#087f5b"/>
+<rect x="50" y="555" width="1100" height="65" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="68" y="590.04" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Local debugging: kubectl port-forward -&gt; one selected Pod</text>
+<rect x="50" y="659" width="1100" height="42" rx="10" fill="#eaf0f7" stroke="#eaf0f7" stroke-width="2"/>
+<text x="70" y="682.94" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">ClusterIP is internal. Port-forward is a temporary client process; it does not create a permanent public endpoint.</text>
+</svg>

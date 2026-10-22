@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+<title id="title">CRC brings a small cluster onto one computer</title><desc id="desc">CRC was known as CodeReady Containers; Red Hat distributes OpenShift Local builds.</desc>
+<rect width="1440" height="810" fill="#f7f9fc"/>
+<rect width="1440" height="9" fill="#c9190b"/>
+<text x="52" y="44" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c9190b">OPENSHIFT</text>
+<text x="52" y="90" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#182536">CRC brings a small cluster onto one computer</text>
+<text x="52" y="144" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#526174">CRC was known as CodeReady Containers; Red Hat distributes OpenShift Local builds.</text>
+<rect x="55" y="225" width="1330" height="450" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="56" y="241" width="5" height="418" fill="#2266a5"/>
+<text x="79" y="264" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">Host computer</text>
+<rect x="90" y="310" width="390" height="285" rx="14" fill="white" stroke="#2266a5" stroke-width="2"/>
+<rect x="91" y="326" width="5" height="253" fill="#2266a5"/>
+<text x="114" y="349" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#2266a5">Host tools</text>
+<text x="114" y="387" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">crc → manage local environment</text>
+<text x="114" y="419" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">oc → call the cluster API</text>
+<text x="114" y="451" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Browser → console and Routes</text>
+<text x="114" y="483" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Host DNS + virtualization</text>
+<rect x="545" y="310" width="800" height="285" rx="14" fill="white" stroke="#23785a" stroke-width="2"/>
+<rect x="546" y="326" width="5" height="253" fill="#23785a"/>
+<text x="569" y="349" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#23785a">CRC virtual machine</text>
+<text x="569" y="387" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">One cluster node: control plane + application workloads</text>
+<text x="569" y="419" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">CoreOS + kubelet + CRI-O</text>
+<text x="569" y="451" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Platform Pods + application Pods</text>
+<text x="569" y="483" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#182536">Local storage shares the same VM lifecycle</text>
+<path d="M485 450 L535 450" stroke="#526174" stroke-width="3" fill="none"/>
+<path d="M524 443 L535 450 L524 457" fill="none" stroke="#526174" stroke-width="3"/>
+<text x="52" y="768" font-family="Arial, sans-serif" font-size="21" font-weight="400" fill="#526174">Choose openshift or okd preset. A single node cannot provide multi-node high availability.</text>
+</svg>

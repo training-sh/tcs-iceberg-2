@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">Who does what inside a Kubernetes cluster?</title><desc id="desc">The control plane coordinates. Node components run and connect Pods.</desc>
+<rect width="1200" height="720" fill="#f8fafc"/>
+<text x="50" y="47.3" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" text-anchor="start">KUBERNETES / VISUAL GUIDE</text>
+<text x="50" y="92.88" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="34" font-weight="700" text-anchor="start">Who does what inside a Kubernetes cluster?</text>
+<text x="50" y="131.57999999999998" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">The control plane coordinates. Node components run and connect Pods.</text>
+<rect x="50" y="175" width="480" height="80" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="68" y="210.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">kubectl / UI / automation</text>
+<polyline points="290,255 290,315" fill="none" stroke="#7047bd" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="290.0,315.0 284.9,305.2 295.1,305.2" fill="#7047bd"/>
+<text x="310" y="286.94" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">API requests</text>
+<rect x="50" y="290" width="480" height="340" rx="16" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="70" y="316.12" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start">CONTROL PLANE</text>
+<rect x="75" y="345" width="430" height="90" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="93" y="380.04" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">API server</text>
+<text x="93" y="413.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">The shared entry point</text>
+<rect x="75" y="500" width="125" height="105" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="93" y="535.04" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">etcd</text>
+<text x="93" y="566.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Cluster</text>
+<text x="93" y="594.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">state</text>
+<rect x="215" y="500" width="135" height="105" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="233" y="534.22" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="21" font-weight="700" text-anchor="start">Scheduler</text>
+<text x="233" y="566.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Chooses</text>
+<text x="233" y="594.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">a node</text>
+<rect x="365" y="500" width="140" height="105" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="383" y="533.4" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="20" font-weight="700" text-anchor="start">Controllers</text>
+<text x="383" y="566.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Reconcile</text>
+<text x="383" y="594.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">objects</text>
+<polyline points="137,435 137,500" fill="none" stroke="#526581" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="137.0,500.0 131.9,490.2 142.1,490.2" fill="#526581"/>
+<polyline points="282,500 282,435" fill="none" stroke="#526581" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="282.0,435.0 287.1,444.8 276.9,444.8" fill="#526581"/>
+<polyline points="435,500 435,435" fill="none" stroke="#526581" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="435.0,435.0 440.1,444.8 429.9,444.8" fill="#526581"/>
+<rect x="620" y="290" width="530" height="340" rx="16" fill="white" stroke="#087f5b" stroke-width="2"/>
+<text x="640" y="316.12" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start">WORKER NODE</text>
+<rect x="645" y="345" width="480" height="90" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="663" y="380.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Kubelet</text>
+<text x="663" y="413.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Watches assignments; reports status</text>
+<polyline points="505,385 645,385" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="645.0,385.0 635.2,390.1 635.2,379.9" fill="#2563eb"/>
+<text x="548" y="371.12" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start">API</text>
+<rect x="645" y="475" width="210" height="125" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="663" y="510.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">containerd</text>
+<text x="663" y="542.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">CRI runtime</text>
+<text x="663" y="570.76" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Runs containers</text>
+<rect x="910" y="475" width="215" height="125" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="928" y="510.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Pods</text>
+<text x="928" y="543.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Application</text>
+<text x="928" y="571.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">container(s)</text>
+<polyline points="745,435 745,475" fill="none" stroke="#087f5b" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="745.0,475.0 739.9,465.2 750.1,465.2" fill="#087f5b"/>
+<polyline points="855,537 910,537" fill="none" stroke="#526581" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="910.0,537.0 900.2,542.1 900.2,531.9" fill="#526581"/>
+<rect x="50" y="659" width="1100" height="42" rx="10" fill="#eaf0f7" stroke="#eaf0f7" stroke-width="2"/>
+<text x="70" y="682.94" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">CoreDNS handles service names. A CNI plugin handles Pod networking. Service routing also needs a data plane.</text>
+</svg>

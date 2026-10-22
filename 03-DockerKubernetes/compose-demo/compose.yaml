@@ -1,0 +1,26 @@
+name: day51-demo
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: learner
+      POSTGRES_PASSWORD: local-demo-only
+      POSTGRES_DB: practice
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U learner -d practice"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  adminer:
+    image: adminer:4
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

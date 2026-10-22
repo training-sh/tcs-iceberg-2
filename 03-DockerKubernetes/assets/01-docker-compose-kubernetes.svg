@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">From one container to a managed application</title><desc id="desc">The image can stay the same. The way you manage its running copies changes.</desc>
+<rect width="1200" height="720" fill="#f8fafc"/>
+<text x="50" y="47.3" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="700" text-anchor="start">KUBERNETES / VISUAL GUIDE</text>
+<text x="50" y="92.88" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="34" font-weight="700" text-anchor="start">From one container to a managed application</text>
+<text x="50" y="131.57999999999998" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">The image can stay the same. The way you manage its running copies changes.</text>
+<rect x="50" y="180" width="350" height="440" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="68" y="215.04" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Docker Engine</text>
+<text x="68" y="248.57999999999998" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Package and run containers</text>
+<text x="68" y="276.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">on a chosen host.</text>
+<rect x="425" y="180" width="350" height="440" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="443" y="215.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Docker Compose</text>
+<text x="443" y="248.57999999999998" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Describe a multi-container</text>
+<text x="443" y="276.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">application on a Docker host.</text>
+<rect x="800" y="180" width="350" height="440" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="818" y="215.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Kubernetes</text>
+<text x="818" y="248.57999999999998" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Declare desired state;</text>
+<text x="818" y="276.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">controllers keep reconciling it.</text>
+<rect x="80" y="340" width="290" height="95" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="98" y="375.04" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Image</text>
+<text x="98" y="408.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">Reusable application package</text>
+<polyline points="225,435 225,465" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="225.0,465.0 219.9,455.2 230.1,455.2" fill="#2563eb"/>
+<rect x="80" y="465" width="290" height="95" rx="16" fill="#edf4ff" stroke="#2563eb" stroke-width="2"/>
+<text x="98" y="500.04" fill="#2563eb" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Container</text>
+<text x="98" y="533.58" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">A running instance</text>
+<rect x="450" y="350" width="135" height="105" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="468" y="385.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">web</text>
+<text x="468" y="416.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Container</text>
+<rect x="615" y="350" width="135" height="105" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="633" y="385.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">database</text>
+<text x="633" y="416.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Container</text>
+<rect x="455" y="480" width="290" height="80" rx="16" fill="#f3effb" stroke="#7047bd" stroke-width="2"/>
+<text x="473" y="515.04" fill="#7047bd" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Compose project</text>
+<rect x="825" y="350" width="135" height="105" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="843" y="385.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Node A</text>
+<text x="843" y="416.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Pods</text>
+<rect x="990" y="350" width="135" height="105" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="1008" y="385.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Node B</text>
+<text x="1008" y="416.94" fill="#172b4d" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Pods</text>
+<rect x="830" y="480" width="290" height="80" rx="16" fill="#e9f7f0" stroke="#087f5b" stroke-width="2"/>
+<text x="848" y="515.04" fill="#087f5b" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Controllers + API</text>
+<rect x="50" y="659" width="1100" height="42" rx="10" fill="#eaf0f7" stroke="#eaf0f7" stroke-width="2"/>
+<text x="70" y="682.94" fill="#526581" font-family="Segoe UI, DejaVu Sans, Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Compose can restart and scale containers locally. Kubernetes adds cluster-wide scheduling and reconciliation.</text>
+</svg>
