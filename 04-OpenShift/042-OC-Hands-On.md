@@ -78,6 +78,32 @@ Here `--raw` writes credentials to the protected file, not to the screen. Keep t
 
 The export selects this file for the current shell and its child processes. Other existing terminals keep their own environment. Context selection is stored in the file, so terminals explicitly using this same demo kubeconfig share its current-context setting. Do not add this export to `.bashrc`.
 
+### What is inside this kubeconfig file?
+
+`$HOME/oc-demo/kubeconfig` is a local YAML configuration file used by `oc` and `kubectl` to connect to the Kubernetes/OpenShift API. The preceding copy command captures the active configuration, including credentials; it does not create a new identity. `export KUBECONFIG="$HOME/oc-demo/kubeconfig"` tells those clients which file to read. It does not print the file or contact the cluster by itself.
+
+The following describes the fields only; no actual kubeconfig contents or credential values are shown.
+
+| Field | What it contains and why it is needed |
+|---|---|
+| `apiVersion: v1`, `kind: Config` | Identify the document as a kubeconfig configuration |
+| `clusters` | Named cluster connection settings, including `server` (the API URL) and certificate trust settings |
+| `certificate-authority-data` | Base64-encoded CA certificate used to verify the API server's certificate; this is trust information, not a client private key |
+| `users` | Named authentication entries; a user entry can contain a token, a client certificate and private key, or an authentication plugin configuration |
+| `client-certificate-data` | Base64-encoded client certificate presented to the server when client certificate authentication is used |
+| `client-key-data` | Base64-encoded private key paired with that client certificate; keep this secret |
+| `token` | Bearer credential used by token-based authentication; keep this secret |
+| `contexts` | Named combinations of a cluster entry, a user entry and an optional default namespace |
+| `current-context` | Name of the context selected by default for commands |
+
+Not every authentication field appears in every file. For example, an identity may use a token instead of `client-certificate-data` and `client-key-data`. Certificate fields can also reference files through `certificate-authority`, `client-certificate` and `client-key`. The earlier `--flatten` option embeds referenced certificate material in the copied configuration so it does not depend on those separate certificate files.
+
+The word **client** here means the `oc` or `kubectl` program connecting to the API server. A client certificate identifies that client identity, and its private key proves possession of the certificate. These fields are authentication material, rather than application or customer records. Base64 encoding is not encryption: the private key and token remain sensitive even when they look like long encoded strings.
+
+When you run `oc get pods`, the client reads `current-context`, finds the referenced cluster and user, verifies the server using the configured trust information, and authenticates using the user's credentials. The context's namespace supplies the default unless you specify `-n`. The server then checks that identity's permissions through RBAC.
+
+Keep the kubeconfig private and out of Git, screenshots and shared notes. The `chmod 600` above restricts access to the file owner on Ubuntu. There is no need to print or decode its certificate, private-key or token values for this exercise.
+
 ### Create context-demo
 
 Read the existing cluster and identity names, then create the context:
@@ -579,17 +605,38 @@ test -n "$NGINX_IMAGE"
 
 ## 11 · Launch the custom NGINX image with oc
 
-new-app generates a Deployment and Service from the built image. Save the generated YAML, then apply it. NGINX has no database connection or API proxy.
+`new-app` generates a Deployment and Service from the built ImageStreamTag. OpenShift can generate a single-space image placeholder for its image trigger to fill later. Resolve that placeholder before applying the manifest, and use the `v1` tag created in step 10. NGINX has no database connection or API proxy.
 
 ```bash
-oc -n project-demo new-app --docker-image="$NGINX_IMAGE" --name=nginx-demo \
-  --dry-run -o yaml > manifests/07-nginx-app.yaml
-oc -n project-demo apply -f manifests/07-nginx-app.yaml
+NGINX_IMAGE=$(oc -n project-demo get istag nginx-demo:v1 \
+  -o jsonpath='{.image.dockerImageReference}')
+case "$NGINX_IMAGE" in
+  ''|*[[:space:]]*) echo 'Invalid NGINX image reference; check nginx-demo:v1.' >&2; return 1 2>/dev/null || exit 1 ;;
+esac
+oc -n project-demo new-app --image-stream=nginx-demo:v1 --name=nginx-demo \
+  --dry-run -o json > manifests/07-nginx-app-generated.json
+python3 - "$NGINX_IMAGE" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+manifest = json.loads(Path('manifests/07-nginx-app-generated.json').read_text())
+for item in manifest['items']:
+    if item['kind'] == 'Deployment':
+        for container in item['spec']['template']['spec']['containers']:
+            if container['name'] == 'nginx-demo':
+                container['image'] = sys.argv[1]
+Path('manifests/07-nginx-app.json').write_text(json.dumps(manifest, indent=2) + '\n')
+PY
+oc -n project-demo apply --dry-run=server -f manifests/07-nginx-app.json
+oc -n project-demo apply -f manifests/07-nginx-app.json
 oc -n project-demo rollout status deployment/nginx-demo --timeout=300s
 oc -n project-demo exec deployment/nginx-demo -- wget -qO- http://nginx-demo:8080/
 oc -n project-demo get pods,services,pvc
 oc -n project-demo get builds,imagestreams
 ```
+
+JSON is accepted directly by `oc apply`. The generated manifest retains the `nginx-demo:v1` image trigger and supplies a valid image immediately, avoiding the initial `FailedCreate` event. When resuming in another terminal, this block reads `NGINX_IMAGE` again. Use `manifests/07-nginx-app.json` for subsequent applies; an older `07-nginx-app.yaml` may still contain the invalid placeholder. Existing warning events remain visible after a successful repair; check rollout status and ready Pods to assess current health.
 
 ---
 
