@@ -5,6 +5,21 @@
 https://codepad.pro/pad/IBd6pJ_iW7VX
 
 
+## Chrome
+
+ Download latest Google Chrome .deb
+```
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+```
+
+ Install
+```
+sudo apt install -y ./google-chrome-stable_current_amd64.deb
+```
+ Remove downloaded installer
+```
+rm google-chrome-stable_current_amd64.deb
+```
 
 OpenShift data engineering training guides and lessons.
 
