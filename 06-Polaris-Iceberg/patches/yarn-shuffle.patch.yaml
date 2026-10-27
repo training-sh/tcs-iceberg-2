@@ -1,0 +1,8 @@
+# Strategic-merge patch for service/nodemanager; NOT for oc apply.
+# Preserves other Service ports. No pod restart is required.
+spec:
+  ports:
+    - name: shuffle
+      protocol: TCP
+      port: 13562
+      targetPort: 13562

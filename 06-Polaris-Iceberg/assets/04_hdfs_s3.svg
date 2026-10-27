@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="864pt" height="316.8pt" viewBox="0 0 864 316.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-04T19:05:18.800443</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 316.8 
+L 864 316.8 
+L 864 0 
+L 0 0 
+z
+" style="fill: #f4f8fc"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 233.551266 98.676 
+Q 279.936408 98.676 324.309089 98.676 
+" clip-path="url(#p812d539c8b)" style="fill: none; stroke: #168269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 317.909089 95.476 
+L 324.309089 98.676 
+L 317.909089 101.876 
+z
+" clip-path="url(#p812d539c8b)" style="fill: #168269; stroke: #168269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 523.858852 98.676 
+Q 573.696728 98.676 621.522142 98.676 
+" clip-path="url(#p812d539c8b)" style="fill: none; stroke: #168269; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 615.122142 95.476 
+L 621.522142 98.676 
+L 615.122142 101.876 
+z
+" clip-path="url(#p812d539c8b)" style="fill: #168269; stroke: #168269; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 425.088 138.296566 
+Q 425.088 163.657175 425.088 187.005323 
+" clip-path="url(#p812d539c8b)" style="fill: none; stroke: #2563b8; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 428.288 180.605323 
+L 425.088 187.005323 
+L 421.888 180.605323 
+z
+" clip-path="url(#p812d539c8b)" style="fill: #2563b8; stroke: #2563b8; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 42.8544 139.716 
+L 226.7136 139.716 
+Q 235.008 139.716 235.008 131.508 
+L 235.008 65.844 
+Q 235.008 57.636 226.7136 57.636 
+L 42.8544 57.636 
+Q 34.56 57.636 34.56 65.844 
+L 34.56 131.508 
+Q 34.56 139.716 42.8544 139.716 
+z
+" clip-path="url(#p812d539c8b)" style="fill: #ffffff; stroke: #168269; stroke-width: 1.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 333.1584 139.716 
+L 517.0176 139.716 
+Q 525.312 139.716 525.312 131.508 
+L 525.312 65.844 
+Q 525.312 57.636 517.0176 57.636 
+L 333.1584 57.636 
+Q 324.864 57.636 324.864 65.844 
+L 324.864 131.508 
+Q 324.864 139.716 333.1584 139.716 
+z
+" clip-path="url(#p812d539c8b)" style="fill: #ffffff; stroke: #2563b8; stroke-width: 1.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 630.3744 139.716 
+L 814.2336 139.716 
+Q 822.528 139.716 822.528 131.508 
+L 822.528 65.844 
+Q 822.528 57.636 814.2336 57.636 
+L 630.3744 57.636 
+Q 622.08 57.636 622.08 65.844 
+L 622.08 131.508 
+Q 622.08 139.716 630.3744 139.716 
+z
+" clip-path="url(#p812d539c8b)" style="fill: #ffffff; stroke: #168269; stroke-width: 1.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 333.1584 262.836 
+L 517.0176 262.836 
+Q 525.312 262.836 525.312 254.628 
+L 525.312 195.804 
+Q 525.312 187.596 517.0176 187.596 
+L 333.1584 187.596 
+Q 324.864 187.596 324.864 195.804 
+L 324.864 254.628 
+Q 324.864 262.836 333.1584 262.836 
+z
+" clip-path="url(#p812d539c8b)" style="fill: #ffffff; stroke: #2563b8; stroke-width: 1.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <g id="patch_9">
+     <path d="M 249.029438 91.764 
+L 310.842563 91.764 
+L 310.842563 78.803297 
+L 249.029438 78.803297 
+z
+" style="fill: #f4f8fc"/>
+    </g>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #168269" x="279.936" y="87.621891" transform="rotate(-0 279.936 87.621891)">Hadoop read</text>
+   </g>
+   <g id="text_2">
+    <g id="patch_10">
+     <path d="M 546.572953 91.764 
+L 600.819047 91.764 
+L 600.819047 78.803297 
+L 546.572953 78.803297 
+z
+" style="fill: #f4f8fc"/>
+    </g>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #168269" x="573.696" y="87.621891" transform="rotate(-0 573.696 87.621891)">FileIO write</text>
+   </g>
+   <g id="text_3">
+    <g id="patch_11">
+     <path d="M 385.613859 156.744 
+L 464.562141 156.744 
+L 464.562141 143.783297 
+L 385.613859 143.783297 
+z
+" style="fill: #f4f8fc"/>
+    </g>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #2563b8" x="425.088" y="152.601891" transform="rotate(-0 425.088 152.601891)">catalog requests</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #12283f" transform="translate(82.855406 94.932348)">HDFS landing zone</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #12283f" transform="translate(102.903766 108.135355)">Source files</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #12283f" transform="translate(382.250734 94.932348)">Spark ingestion</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #12283f" transform="translate(353.488313 108.135355)">Transform + write Iceberg</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #12283f" transform="translate(650.905406 94.932348)">S3-compatible warehouse</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #12283f" transform="translate(654.656578 108.135355)">Governed Iceberg tables</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #12283f" transform="translate(384.995578 221.472348)">Polaris catalog</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #12283f" transform="translate(357.224016 234.675355)">S3 storage configuration</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #12283f" x="432" y="299.088" transform="rotate(-0 432 299.088)">HDFS is upstream here; this diagram does not configure an HDFS Polaris warehouse.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p812d539c8b">
+   <rect x="17.28" y="6.336" width="829.44" height="300.96"/>
+  </clipPath>
+ </defs>
+</svg>

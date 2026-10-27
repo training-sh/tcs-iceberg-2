@@ -1,0 +1,12 @@
+# Strategic-merge patch, NOT a full manifest for oc apply.
+# Tested on 100.112.190.74; see ../CHANGES.md and ../VALIDATION.md.
+# Isolated single-DataNode classroom profile: relax reverse-DNS validation.
+# Prefer repair.py --fix hdfs: it preserves any additional current arguments.
+spec:
+  template:
+    spec:
+      containers:
+        - name: namenode
+          args:
+            - namenode
+            - -Ddfs.namenode.datanode.registration.ip-hostname-check=false

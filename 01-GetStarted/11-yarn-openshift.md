@@ -122,6 +122,20 @@ oc -n bigdata exec namenode-0 -- hdfs dfs -cat /training/mapreduce/input/words.t
 
 ## 4. Run MapReduce word count
 
+Before submitting, check that the NodeManager Service exposes the MapReduce shuffle port. A Ready NodeManager can run the mapper while reducers fail to fetch its output if this port is missing.
+
+```bash
+oc -n bigdata get service nodemanager -o jsonpath='{range .spec.ports[*]}{.name}{" "}{.port}{" -> "}{.targetPort}{"\n"}{end}'
+```
+
+The list must include TCP port `13562` targeting `13562`. Older cloned labs may omit it. Only if it is missing, add the port with this targeted Service patch. This preserves the other ports and does not restart the NodeManager or change replicas.
+
+```bash
+oc -n bigdata patch service nodemanager --type=strategic -p '{"spec":{"ports":[{"name":"shuffle","port":13562,"targetPort":13562,"protocol":"TCP"}]}}'
+```
+
+Repeat the inspection command and confirm `shuffle 13562 -> 13562`. This fixes the confirmed missing-Service-port issue; it does not diagnose every possible shuffle failure. If reducers still fail, inspect the application's task diagnostics in the History Server.
+
 Submit the MapReduce word-count job and wait for successful completion. The output directory must not already exist.
 
 ```bash

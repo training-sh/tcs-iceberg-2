@@ -1,0 +1,11 @@
+# Strategic-merge patch for statefulset/trino; NOT for oc apply.
+# Changing the pod template restarts Trino. Images/volumes/replicas unchanged.
+spec:
+  template:
+    spec:
+      containers:
+        - name: trino
+          env:
+            - name: HIVE_METASTORE_HOST
+              value: hive-metastore.bigdata.svc.cluster.local
+              valueFrom: null

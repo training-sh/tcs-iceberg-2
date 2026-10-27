@@ -51,7 +51,7 @@ HDFS uses one NameNode StatefulSet, one DataNode StatefulSet, two Services and p
 Inspect StatefulSets, which manage the stable pod identities and persistent storage used by these services.
 
 ```bash
-oc -n bigdata get statefulset -l 'app in (namenode,datanode)' -o wide
+oc -n bigdata get statefulset/namenode statefulset/datanode -o wide
 ```
 
 List the matching pods and check their `READY` and `STATUS` columns.
@@ -63,13 +63,13 @@ oc -n bigdata get pod -l 'app in (namenode,datanode)' -o wide
 Inspect Services, which give pods stable network names and ports.
 
 ```bash
-oc -n bigdata get service -l 'app in (namenode,datanode)' -o wide
+oc -n bigdata get service/namenode service/datanode -o wide
 ```
 
 Inspect persistent volume claims. Confirm `Bound` status and check requested storage.
 
 ```bash
-oc -n bigdata get pvc -l 'app in (namenode,datanode)' -o wide
+oc -n bigdata get pvc data-namenode-0 data-datanode-0 -o wide
 ```
 
 Display pod labels. The `-l` selector matches pods whose `app` label is `namenode` or `datanode`.
@@ -151,6 +151,28 @@ oc -n bigdata exec namenode-0 -- hdfs dfsadmin -report
 ```
 
 ## 5. Run HDFS commands without opening a shell
+
+Before writing data, the preceding `dfsadmin -report` must show one live DataNode, nonzero capacity and no `Safe mode is ON`. Ready pods alone do not prove DataNode registration.
+
+If registration fails, inspect its logs:
+
+```bash
+oc -n bigdata logs datanode-0 --tail=60
+```
+
+For the confirmed `DisallowedDatanodeException` / hostname-resolution registration failure, inspect the isolated classroom correction from the course repository root:
+
+```bash
+python3 06-Polaris-Iceberg/patches/repair.py --fix hdfs
+```
+
+Only if that failure is present, save work and apply the correction. This rolls the NameNode without changing its image or persistent volumes:
+
+```bash
+python3 06-Polaris-Iceberg/patches/repair.py --fix hdfs --apply
+```
+
+Repeat `hdfs dfsadmin -report` and continue only after registration succeeds and safe mode clears. The patch relaxes reverse-hostname validation for this single-DataNode classroom profile; it is not needed on every clone. See [patch instructions](../06-Polaris-Iceberg/patches/README.md). Do not force safe mode off or format/delete storage to bypass a registration failure.
 
 `oc exec` is the Kubernetes equivalent of `docker exec`. Everything after `--` runs inside the selected container.
 

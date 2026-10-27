@@ -23,7 +23,7 @@ Spark standalone uses one master pod and one scalable worker StatefulSet. The ma
 Inspect the workload definitions and Services for these components.
 
 ```bash
-oc -n bigdata get statefulset,service -l 'app in (spark-master,spark-worker)' -o wide
+oc -n bigdata get statefulset/spark-master statefulset/spark-worker service/spark-master service/spark-worker -o wide
 ```
 
 List the matching pods and check their `READY` and `STATUS` columns.
@@ -128,6 +128,8 @@ oc -n bigdata get pods -l app=spark-worker -o wide
 
 ## 6. Restart and stop Spark
 
+Save notebooks and finish or stop active Spark jobs before continuing. Restarting the master pod also restarts JupyterLab and the History Server and interrupts notebook sessions. Port-forward commands may exit when their selected pod restarts; start them again after the rollout succeeds.
+
 Restart these workloads. Their persistent volumes remain attached; wait for readiness in the following steps.
 
 ```bash
@@ -160,6 +162,16 @@ Set these workloads to one replica. This starts stopped workloads or keeps an ex
 
 ```bash
 oc -n bigdata scale statefulset/spark-master statefulset/spark-worker --replicas=1
+```
+
+Wait for both workloads before reopening Jupyter or continuing to another lesson.
+
+```bash
+oc -n bigdata rollout status statefulset/spark-master --timeout=300s
+```
+
+```bash
+oc -n bigdata rollout status statefulset/spark-worker --timeout=300s
 ```
 
 ## Watch Kubernetes logs
