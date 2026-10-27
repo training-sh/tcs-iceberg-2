@@ -1,3 +1,14 @@
+# Git Clone for all machines
+
+Baseline your commands from the cloned directory
+
+```
+cd ~
+git clone https://github.com/training-sh/tcs-iceberg-2
+
+cd tcs-iceberg-2
+```
+
 # IceBerg Trino Spark
 
 # for any code sharing, link sharing
