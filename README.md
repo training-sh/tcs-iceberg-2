@@ -1,4 +1,35 @@
-# Git Clone for all machines
+# Port Forward
+
+Port forward for polaris and s3
+
+On Terminal 1
+
+```
+okd-env
+
+cd tcs-iceberg-2
+oc -n bigdata port-forward --address=127.0.0.1 service/spark-master 18888:8888
+```
+
+On Terminal 2
+
+```
+okd-env
+
+cd tcs-iceberg-2
+bash 05-S3-DataLake/forward-seaweedfs.sh
+```
+
+On Terminal 3
+
+
+```
+okd-env
+cd tcs-iceberg-2
+
+bash 05-S3-DataLake/forward-polaris.sh
+```
+
 
 ```
 sudo tailscale down
