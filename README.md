@@ -1,5 +1,11 @@
 # Git Clone for all machines
 
+```
+sudo tailscale down
+sudo systemctl disable --now tailscaled
+sudo apt purge -y tailscale
+```
+
 
 # CRC Memory Adjustment
 
