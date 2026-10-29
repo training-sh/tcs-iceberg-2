@@ -1,5 +1,15 @@
 # Git Clone for all machines
 
+
+# CRC Memory Adjustment
+
+```
+crc stop
+crc config set memory 18432
+crc start
+```
+
+
 Baseline your commands from the cloned directory
 
 ```
