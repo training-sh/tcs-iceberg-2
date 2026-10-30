@@ -4,7 +4,7 @@
 
 Build a minimal end-to-end Kubernetes deployment on OpenShift using the `oc` client. Create a project, build container images, deploy Pods and Services, connect FastAPI to PostgreSQL, and read application logs through a shared volume.
 
-Create all application files under `~/oc-demo`, select `context-demo` and work in `project-demo`.
+Create all application files under `~/oc-demo`, select `context-demo` and work in `project-demo2`.
 
 ![FastAPI, PostgreSQL and shared-volume logging](assets/042-connected-application.png)
 
@@ -50,7 +50,7 @@ A **context** is a named kubeconfig entry that selects a cluster, an identity an
 | User | Identity and credentials for accessing the cluster |
 | Namespace | Default destination for namespaced commands without `-n` |
 
-Creating a context does not create a cluster, user or namespace. `context-demo` reuses the existing cluster and identity while selecting `project-demo`.
+Creating a context does not create a cluster, user or namespace. `context-demo` reuses the existing cluster and identity while selecting `project-demo2`.
 
 ### List contexts and get the current context
 
@@ -112,11 +112,11 @@ Read the existing cluster and identity names, then create the context:
 DEMO_CLUSTER=$(oc config view --minify -o jsonpath='{.contexts[0].context.cluster}')
 DEMO_USER=$(oc config view --minify -o jsonpath='{.contexts[0].context.user}')
 oc config set-context context-demo --cluster="$DEMO_CLUSTER" \
-  --user="$DEMO_USER" --namespace=project-demo
+  --user="$DEMO_USER" --namespace=project-demo2
 oc config get-contexts context-demo
 ```
 
-`set-context` creates or updates an entry; it does not select it. Naming `project-demo` here does not create the project.
+`set-context` creates or updates an entry; it does not select it. Naming `project-demo2` here does not create the project.
 
 ### Select the default context for this terminal
 
@@ -132,34 +132,34 @@ Expect `context-demo` as the current name. Commands now use this context in the 
 
 A Kubernetes **namespace** groups resources such as Pods, Services, ConfigMaps, Secrets and PVCs. The same resource name can exist in different namespaces.
 
-An OpenShift **project** is the user-facing representation of a namespace with OpenShift access and management features. `project-demo` appears in both listings. Nodes and PersistentVolumes are cluster-scoped; they are not contained in a namespace.
+An OpenShift **project** is the user-facing representation of a namespace with OpenShift access and management features. `project-demo2` appears in both listings. Nodes and PersistentVolumes are cluster-scoped; they are not contained in a namespace.
 
 ```bash
 oc get projects
 oc get namespaces
 ```
 
-### Create and select project-demo
+### Create and select project-demo2
 
 ```bash
-if ! oc get project project-demo >/dev/null 2>&1; then
-  oc new-project project-demo
+if ! oc get project project-demo2 >/dev/null 2>&1; then
+  oc new-project project-demo2
 fi
 # new-project can select a generated context; return to our named context.
 oc config use-context context-demo
-oc project project-demo
+oc project project-demo2
 oc project
-oc get namespace project-demo
-oc -n project-demo get pods
+oc get namespace project-demo2
+oc -n project-demo2 get pods
 ```
 
-A new project reports no Pods. An existing demo project lists its workloads. `oc project project-demo` sets the default namespace in the selected context. Subsequent commands also use explicit `-n project-demo` flags to make their destination visible.
+A new project reports no Pods. An existing demo project lists its workloads. `oc project project-demo2` sets the default namespace in the selected context. Subsequent commands also use explicit `-n project-demo2` flags to make their destination visible.
 
 ### Effect on bigdata
 
 These steps preserve the original kubeconfig and do not modify or delete `bigdata` workloads. The demo shares the same cluster, so its builds, Pods and storage consume shared capacity and can affect other workloads if the node runs short of resources.
 
-The existing administrator identity is reused. A context selects a destination; it does not restrict permissions. An explicit `-n bigdata` command would still target `bigdata`. Keep the commands here scoped to `project-demo` and avoid cluster-wide changes.
+The existing administrator identity is reused. A context selects a destination; it does not restrict permissions. An explicit `-n bigdata` command would still target `bigdata`. Keep the commands here scoped to `project-demo2` and avoid cluster-wide changes.
 
 ---
 
@@ -191,8 +191,8 @@ stringData:
   DB_USER: demouser
   DB_PASSWORD: DemoDbPass42
 YAML
-oc -n project-demo apply -f manifests/01-config.yaml
-oc -n project-demo get configmap/demo-config secret/demo-secret
+oc -n project-demo2 apply -f manifests/01-config.yaml
+oc -n project-demo2 get configmap/demo-config secret/demo-secret
 ```
 
 ---
@@ -254,7 +254,7 @@ oc describe storageclass crc-csi-hostpath-provisioner
 
 The creation block below ends with commands to inspect the database claim and print its bound PV name.
 
-`oc get pv` lists cluster-wide storage, including other projects. Inspection is read-only; cleanup must target only PVs belonging to `project-demo`.
+`oc get pv` lists cluster-wide storage, including other projects. Inspection is read-only; cleanup must target only PVs belonging to `project-demo2`.
 
 ### What happens when a Pod or claim is deleted?
 
@@ -337,12 +337,12 @@ spec:
         resources:
           requests: {storage: 1Gi}
 YAML
-oc -n project-demo apply -f manifests/02-postgresql.yaml
-oc -n project-demo rollout status statefulset/postgresql --timeout=300s
-oc -n project-demo get pods,svc,pvc
-oc -n project-demo describe pvc data-postgresql-0
+oc -n project-demo2 apply -f manifests/02-postgresql.yaml
+oc -n project-demo2 rollout status statefulset/postgresql --timeout=300s
+oc -n project-demo2 get pods,svc,pvc
+oc -n project-demo2 describe pvc data-postgresql-0
 oc get pv
-oc -n project-demo get pvc data-postgresql-0 \
+oc -n project-demo2 get pvc data-postgresql-0 \
   -o jsonpath='{.spec.volumeName}{"\n"}'
 ```
 
@@ -413,11 +413,11 @@ DOCKER
 A binary BuildConfig uploads the chosen directory, builds its Dockerfile inside the cluster and pushes the image to the integrated registry. Save the generated build objects as YAML. Docker Engine is not needed on the Ubuntu host.
 
 ```bash
-oc -n project-demo new-build --name=fastapi-demo --binary --strategy=docker \
+oc -n project-demo2 new-build --name=fastapi-demo --binary --strategy=docker \
   --to=fastapi-demo:v1 --dry-run -o yaml > manifests/03-fastapi-build.yaml
-oc -n project-demo apply -f manifests/03-fastapi-build.yaml
-oc -n project-demo start-build fastapi-demo --from-dir=fastapi --follow --wait
-API_IMAGE=$(oc -n project-demo get istag fastapi-demo:v1 \
+oc -n project-demo2 apply -f manifests/03-fastapi-build.yaml
+oc -n project-demo2 start-build fastapi-demo --from-dir=fastapi --follow --wait
+API_IMAGE=$(oc -n project-demo2 get istag fastapi-demo:v1 \
   -o jsonpath='{.image.dockerImageReference}')
 test -n "$API_IMAGE"
 ```
@@ -488,8 +488,8 @@ spec:
 YAML
 sed "s|fastapi-demo:placeholder|$API_IMAGE|" \
   manifests/04-fastapi.yaml > manifests/04-fastapi-resolved.yaml
-oc -n project-demo apply -f manifests/04-fastapi-resolved.yaml
-oc -n project-demo rollout status deployment/fastapi --timeout=300s
+oc -n project-demo2 apply -f manifests/04-fastapi-resolved.yaml
+oc -n project-demo2 rollout status deployment/fastapi --timeout=300s
 ```
 
 ---
@@ -536,8 +536,8 @@ spec:
         - name: logs
           persistentVolumeClaim: {claimName: shared-logs}
 YAML
-oc -n project-demo apply -f manifests/05-log-collector.yaml
-oc -n project-demo rollout status deployment/log-collector --timeout=300s
+oc -n project-demo2 apply -f manifests/05-log-collector.yaml
+oc -n project-demo2 rollout status deployment/log-collector --timeout=300s
 ```
 
 ---
@@ -547,12 +547,12 @@ oc -n project-demo rollout status deployment/log-collector --timeout=300s
 The request reaches FastAPI through its Service. FastAPI queries PostgreSQL through its Service and writes a log record. Both Pods below read the same underlying file, while oc logs reads each container's stdout and stderr.
 
 ```bash
-oc -n project-demo exec deployment/fastapi -- python -c \
+oc -n project-demo2 exec deployment/fastapi -- python -c \
   'import urllib.request; print(urllib.request.urlopen("http://fastapi:8000/db").read().decode())'
-oc -n project-demo exec deployment/fastapi -- cat /logs/app.log
-oc -n project-demo exec deployment/log-collector -- cat /logs/app.log
-oc -n project-demo logs deployment/fastapi --tail=10
-oc -n project-demo logs deployment/log-collector --tail=10
+oc -n project-demo2 exec deployment/fastapi -- cat /logs/app.log
+oc -n project-demo2 exec deployment/log-collector -- cat /logs/app.log
+oc -n project-demo2 logs deployment/fastapi --tail=10
+oc -n project-demo2 logs deployment/log-collector --tail=10
 ```
 
 ---
@@ -592,11 +592,11 @@ EXPOSE 8080
 ENTRYPOINT ["nginx"]
 CMD ["-g", "daemon off;"]
 DOCKER
-oc -n project-demo new-build --name=nginx-demo --binary --strategy=docker \
+oc -n project-demo2 new-build --name=nginx-demo --binary --strategy=docker \
   --to=nginx-demo:v1 --dry-run -o yaml > manifests/06-nginx-build.yaml
-oc -n project-demo apply -f manifests/06-nginx-build.yaml
-oc -n project-demo start-build nginx-demo --from-dir=nginx --follow --wait
-NGINX_IMAGE=$(oc -n project-demo get istag nginx-demo:v1 \
+oc -n project-demo2 apply -f manifests/06-nginx-build.yaml
+oc -n project-demo2 start-build nginx-demo --from-dir=nginx --follow --wait
+NGINX_IMAGE=$(oc -n project-demo2 get istag nginx-demo:v1 \
   -o jsonpath='{.image.dockerImageReference}')
 test -n "$NGINX_IMAGE"
 ```
@@ -608,12 +608,12 @@ test -n "$NGINX_IMAGE"
 `new-app` generates a Deployment and Service from the built ImageStreamTag. OpenShift can generate a single-space image placeholder for its image trigger to fill later. Resolve that placeholder before applying the manifest, and use the `v1` tag created in step 10. NGINX has no database connection or API proxy.
 
 ```bash
-NGINX_IMAGE=$(oc -n project-demo get istag nginx-demo:v1 \
+NGINX_IMAGE=$(oc -n project-demo2 get istag nginx-demo:v1 \
   -o jsonpath='{.image.dockerImageReference}')
 case "$NGINX_IMAGE" in
   ''|*[[:space:]]*) echo 'Invalid NGINX image reference; check nginx-demo:v1.' >&2; return 1 2>/dev/null || exit 1 ;;
 esac
-oc -n project-demo new-app --image-stream=nginx-demo:v1 --name=nginx-demo \
+oc -n project-demo2 new-app --image-stream=nginx-demo:v1 --name=nginx-demo \
   --dry-run -o json > manifests/07-nginx-app-generated.json
 python3 - "$NGINX_IMAGE" <<'PY'
 import json
@@ -628,12 +628,12 @@ for item in manifest['items']:
                 container['image'] = sys.argv[1]
 Path('manifests/07-nginx-app.json').write_text(json.dumps(manifest, indent=2) + '\n')
 PY
-oc -n project-demo apply --dry-run=server -f manifests/07-nginx-app.json
-oc -n project-demo apply -f manifests/07-nginx-app.json
-oc -n project-demo rollout status deployment/nginx-demo --timeout=300s
-oc -n project-demo exec deployment/nginx-demo -- wget -qO- http://nginx-demo:8080/
-oc -n project-demo get pods,services,pvc
-oc -n project-demo get builds,imagestreams
+oc -n project-demo2 apply --dry-run=server -f manifests/07-nginx-app.json
+oc -n project-demo2 apply -f manifests/07-nginx-app.json
+oc -n project-demo2 rollout status deployment/nginx-demo --timeout=300s
+oc -n project-demo2 exec deployment/nginx-demo -- wget -qO- http://nginx-demo:8080/
+oc -n project-demo2 get pods,services,pvc
+oc -n project-demo2 get builds,imagestreams
 ```
 
 JSON is accepted directly by `oc apply`. The generated manifest retains the `nginx-demo:v1` image trigger and supplies a valid image immediately, avoiding the initial `FailedCreate` event. When resuming in another terminal, this block reads `NGINX_IMAGE` again. Use `manifests/07-nginx-app.json` for subsequent applies; an older `07-nginx-app.yaml` may still contain the invalid placeholder. Existing warning events remain visible after a successful repair; check rollout status and ready Pods to assess current health.
@@ -656,19 +656,19 @@ cd "$HOME/oc-demo"
 ## 13 · Inspect Pods, Services and volumes
 
 ```bash
-oc -n project-demo get deployment,statefulset,pods
-oc -n project-demo get pods -o wide --show-labels
-oc -n project-demo get services
-oc -n project-demo get pvc
-oc -n project-demo describe deployment fastapi
-oc -n project-demo describe service fastapi
-oc -n project-demo get endpointslices -l kubernetes.io/service-name=fastapi
-oc -n project-demo get events --sort-by=.metadata.creationTimestamp
+oc -n project-demo2 get deployment,statefulset,pods
+oc -n project-demo2 get pods -o wide --show-labels
+oc -n project-demo2 get services
+oc -n project-demo2 get pvc
+oc -n project-demo2 describe deployment fastapi
+oc -n project-demo2 describe service fastapi
+oc -n project-demo2 get endpointslices -l kubernetes.io/service-name=fastapi
+oc -n project-demo2 get events --sort-by=.metadata.creationTimestamp
 ```
 
 | Object | What it does here |
 |---|---|
-| Project / namespace | Groups application resources inside `project-demo` |
+| Project / namespace | Groups application resources inside `project-demo2` |
 | Context | Selects cluster, identity and namespace in local client configuration |
 | Deployment | Maintains the desired number of FastAPI, collector or NGINX Pods |
 | ReplicaSet | Created by a Deployment to maintain its Pods |
@@ -708,7 +708,7 @@ If sign-in is required, display the CRC login instructions:
 crc console --credentials
 ```
 
-Select **project-demo** in the console's project selector. The browser's selected project is independent of the terminal's context.
+Select **project-demo2** in the console's project selector. The browser's selected project is independent of the terminal's context.
 
 Inspect the same objects shown by `oc`:
 
@@ -729,13 +729,13 @@ Inspect these resources before the cleanup section; deleting the project removes
 In Ubuntu terminal A, initialized with section 12:
 
 ```bash
-oc -n project-demo port-forward --address=127.0.0.1 service/fastapi 18090:8000
+oc -n project-demo2 port-forward --address=127.0.0.1 service/fastapi 18090:8000
 ```
 
 In Ubuntu terminal B, also initialized:
 
 ```bash
-oc -n project-demo port-forward --address=127.0.0.1 service/nginx-demo 18091:8080
+oc -n project-demo2 port-forward --address=127.0.0.1 service/nginx-demo 18091:8080
 ```
 
 Keep both terminals running. Open **Firefox or another browser inside the same Ubuntu desktop**:
@@ -756,17 +756,17 @@ Every `/db` request runs the SELECT and adds a log entry. NGINX serves only its 
 Make another database request and read the file from both Pods:
 
 ```bash
-oc -n project-demo exec deployment/fastapi -- python -c \
+oc -n project-demo2 exec deployment/fastapi -- python -c \
   'import urllib.request; print(urllib.request.urlopen("http://fastapi:8000/db").read().decode())'
-oc -n project-demo exec deployment/fastapi -- cat /logs/app.log
-oc -n project-demo exec deployment/log-collector -- cat /logs/app.log
-oc -n project-demo logs deployment/log-collector --tail=20
+oc -n project-demo2 exec deployment/fastapi -- cat /logs/app.log
+oc -n project-demo2 exec deployment/log-collector -- cat /logs/app.log
+oc -n project-demo2 logs deployment/log-collector --tail=20
 ```
 
 To follow new lines continuously:
 
 ```bash
-oc -n project-demo logs -f deployment/log-collector
+oc -n project-demo2 logs -f deployment/log-collector
 ```
 
 Refresh `/db` in the Ubuntu browser. A new SELECT line appears in the collector output. Press `Ctrl+C` when finished.
@@ -789,11 +789,11 @@ The database and log PVCs are separate. The collector mounts the log volume read
 ## 16 · Inspect shared-volume placement and persistence
 
 ```bash
-oc -n project-demo get pods -l 'app in (fastapi,log-collector)' -o wide
-oc -n project-demo describe pvc shared-logs
-oc -n project-demo exec deployment/fastapi -- id
-oc -n project-demo exec deployment/log-collector -- id
-oc -n project-demo exec deployment/log-collector -- ls -l /logs
+oc -n project-demo2 get pods -l 'app in (fastapi,log-collector)' -o wide
+oc -n project-demo2 describe pvc shared-logs
+oc -n project-demo2 exec deployment/fastapi -- id
+oc -n project-demo2 exec deployment/log-collector -- id
+oc -n project-demo2 exec deployment/log-collector -- ls -l /logs
 ```
 
 `ReadWriteOnce` allows multiple Pods on the **same node** to mount the volume. The collector's Pod affinity chooses the FastAPI node. This is different from `ReadWriteOncePod`, which permits only one Pod. Keep FastAPI at one replica in this demonstration.
@@ -803,9 +803,9 @@ OpenShift supplies permitted non-root IDs and a volume group through its securit
 Replace the FastAPI Pod and read the log again:
 
 ```bash
-oc -n project-demo rollout restart deployment/fastapi
-oc -n project-demo rollout status deployment/fastapi --timeout=180s
-oc -n project-demo exec deployment/fastapi -- cat /logs/app.log
+oc -n project-demo2 rollout restart deployment/fastapi
+oc -n project-demo2 rollout status deployment/fastapi --timeout=180s
+oc -n project-demo2 exec deployment/fastapi -- cat /logs/app.log
 ```
 
 The old lines remain because the replacement mounts the same PVC. This demonstration does not add log rotation or indexing. A multi-node logging platform needs a different collection or storage design.
@@ -819,19 +819,19 @@ Reference: [Persistent volume access modes](https://kubernetes.io/docs/concepts/
 Print ordinary settings without printing passwords:
 
 ```bash
-oc -n project-demo exec deployment/fastapi -- python -c \
+oc -n project-demo2 exec deployment/fastapi -- python -c \
   'import os; print({k:os.environ[k] for k in ("APP_NAME","DB_HOST","DB_PORT","DB_NAME","LOG_FILE")})'
-oc -n project-demo get secret demo-secret
+oc -n project-demo2 get secret demo-secret
 ```
 
 Change the application label and replace the API Pod:
 
 ```bash
-oc -n project-demo patch configmap demo-config --type=merge \
+oc -n project-demo2 patch configmap demo-config --type=merge \
   -p '{"data":{"APP_NAME":"FastAPI configuration updated"}}'
-oc -n project-demo rollout restart deployment/fastapi
-oc -n project-demo rollout status deployment/fastapi --timeout=180s
-oc -n project-demo exec deployment/fastapi -- python -c \
+oc -n project-demo2 rollout restart deployment/fastapi
+oc -n project-demo2 rollout status deployment/fastapi --timeout=180s
+oc -n project-demo2 exec deployment/fastapi -- python -c \
   'import urllib.request; print(urllib.request.urlopen("http://fastapi:8000/db").read().decode())'
 ```
 
@@ -844,14 +844,14 @@ Secret base64 encoding is not encryption. Protect the credential manifest and ku
 ## 18 · Scale the stateless NGINX example
 
 ```bash
-oc -n project-demo scale deployment/nginx-demo --replicas=2
-oc -n project-demo rollout status deployment/nginx-demo --timeout=180s
-oc -n project-demo get pods -l app=nginx-demo -o wide
-oc -n project-demo get endpointslices -l kubernetes.io/service-name=nginx-demo
-oc -n project-demo scale deployment/nginx-demo --replicas=0
-oc -n project-demo get deployment/nginx-demo
-oc -n project-demo scale deployment/nginx-demo --replicas=1
-oc -n project-demo rollout status deployment/nginx-demo --timeout=180s
+oc -n project-demo2 scale deployment/nginx-demo --replicas=2
+oc -n project-demo2 rollout status deployment/nginx-demo --timeout=180s
+oc -n project-demo2 get pods -l app=nginx-demo -o wide
+oc -n project-demo2 get endpointslices -l kubernetes.io/service-name=nginx-demo
+oc -n project-demo2 scale deployment/nginx-demo --replicas=0
+oc -n project-demo2 get deployment/nginx-demo
+oc -n project-demo2 scale deployment/nginx-demo --replicas=1
+oc -n project-demo2 rollout status deployment/nginx-demo --timeout=180s
 ```
 
 Controllers reconcile the replica count asynchronously. The Service remains while backend Pods change. Multiple replicas on one CRC node share its failure domain.
@@ -863,12 +863,12 @@ Keep PostgreSQL, FastAPI and log-collector at one replica here. Scaling PostgreS
 ## 19 · Inspect build output and diagnose problems
 
 ```bash
-oc -n project-demo get builds,imagestreams
-oc -n project-demo get deployment fastapi -o yaml
-oc -n project-demo logs deployment/fastapi --tail=20
-oc -n project-demo logs deployment/log-collector --tail=20
-oc -n project-demo logs deployment/nginx-demo --tail=20
-oc -n project-demo get events --sort-by=.metadata.creationTimestamp
+oc -n project-demo2 get builds,imagestreams
+oc -n project-demo2 get deployment fastapi -o yaml
+oc -n project-demo2 logs deployment/fastapi --tail=20
+oc -n project-demo2 logs deployment/log-collector --tail=20
+oc -n project-demo2 logs deployment/nginx-demo --tail=20
+oc -n project-demo2 get events --sort-by=.metadata.creationTimestamp
 ```
 
 | Symptom | Check |
@@ -895,21 +895,21 @@ This section permanently removes the demo applications, database data, log files
 export KUBECONFIG="$HOME/oc-demo/kubeconfig"
 oc config use-context context-demo
 oc project
-oc -n project-demo get deployments,statefulsets,pods,services,pvc,buildconfigs,imagestreams
+oc -n project-demo2 get deployments,statefulsets,pods,services,pvc,buildconfigs,imagestreams
 ```
 
-Continue only with `project-demo` as the target. The commands below do not delete `bigdata` resources or stop CRC.
+Continue only with `project-demo2` as the target. The commands below do not delete `bigdata` resources or stop CRC.
 
 ### Capture the demo volumes and remove retained storage
 
 The default CRC StorageClass uses `Retain`. Deleting a PVC alone can therefore leave its PV and data behind. Record the demo's bound volumes and change **only those volumes** to `Delete` before deleting the claims:
 
 ```bash
-DEMO_PVS=$(oc -n project-demo get pvc \
+DEMO_PVS=$(oc -n project-demo2 get pvc \
   -o jsonpath='{range .items[*]}{.spec.volumeName}{"\n"}{end}')
 for DEMO_PV in $DEMO_PVS; do
   CLAIM_NAMESPACE=$(oc get pv "$DEMO_PV" -o jsonpath='{.spec.claimRef.namespace}')
-  if [ "$CLAIM_NAMESPACE" != project-demo ]; then
+  if [ "$CLAIM_NAMESPACE" != project-demo2 ]; then
     echo "Unexpected owner for $DEMO_PV; stopping cleanup." >&2
     exit 1
   fi
@@ -925,13 +925,13 @@ This requires administrator permission. The provisioner deletes the storage when
 Delete the controllers first so they cannot recreate Pods. Deleting the Pods terminates their containers:
 
 ```bash
-oc -n project-demo delete deployments,statefulsets --all --wait=true
-oc -n project-demo delete jobs,cronjobs --all --ignore-not-found
-oc -n project-demo delete buildconfigs --all --ignore-not-found
-oc -n project-demo delete builds --all --ignore-not-found
-oc -n project-demo delete pods --all --wait=true --timeout=180s
-oc -n project-demo delete imagestreams --all --ignore-not-found
-oc -n project-demo delete pvc --all --wait=true --timeout=180s
+oc -n project-demo2 delete deployments,statefulsets --all --wait=true
+oc -n project-demo2 delete jobs,cronjobs --all --ignore-not-found
+oc -n project-demo2 delete buildconfigs --all --ignore-not-found
+oc -n project-demo2 delete builds --all --ignore-not-found
+oc -n project-demo2 delete pods --all --wait=true --timeout=180s
+oc -n project-demo2 delete imagestreams --all --ignore-not-found
+oc -n project-demo2 delete pvc --all --wait=true --timeout=180s
 for DEMO_PV in $DEMO_PVS; do
   oc wait --for=delete "pv/$DEMO_PV" --timeout=180s
 done
@@ -940,7 +940,7 @@ done
 Confirm that no demo claims remain:
 
 ```bash
-oc -n project-demo get pvc
+oc -n project-demo2 get pvc
 ```
 
 Expect `No resources found`. The completed PV deletion waits above confirm that the associated volumes were removed too. Do not proceed past a failed deletion wait: inspect the affected PV and its provisioner events instead. Deleting only the PV object manually can leave backend data behind.
@@ -954,13 +954,13 @@ Reference: [OpenShift image pruning and registry storage](https://docs.okd.io/la
 The project deletion removes remaining namespaced objects, including Services, ConfigMaps, Secrets and ServiceAccounts:
 
 ```bash
-oc delete project project-demo --wait=true --timeout=180s
-oc wait --for=delete namespace/project-demo --timeout=180s
-if oc get namespace project-demo >/dev/null 2>&1; then
-  echo 'project-demo still exists; inspect its deletion status.' >&2
+oc delete project project-demo2 --wait=true --timeout=180s
+oc wait --for=delete namespace/project-demo2 --timeout=180s
+if oc get namespace project-demo2 >/dev/null 2>&1; then
+  echo 'project-demo2 still exists; inspect its deletion status.' >&2
   exit 1
 else
-  echo 'project-demo has been removed.'
+  echo 'project-demo2 has been removed.'
 fi
 ```
 
