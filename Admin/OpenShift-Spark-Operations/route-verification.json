@@ -1,0 +1,19 @@
+{
+  "routes.yaml": {
+    "routes": 7,
+    "services": 1,
+    "server_dry_run": "PASS",
+    "applied": false
+  },
+  "routes-apis.yaml": {
+    "routes": 6,
+    "server_dry_run": "PASS",
+    "applied": false
+  },
+  "readme_heredocs_match_files": true,
+  "bash_blocks_checked": 41,
+  "existing_jupyter_route_http": 200,
+  "existing_route_resolves_to": "127.0.0.1",
+  "grafana_requested_account_auth_http": 200,
+  "new_route_end_to_end": "NOT_RUN"
+}

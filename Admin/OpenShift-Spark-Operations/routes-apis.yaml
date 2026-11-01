@@ -1,0 +1,119 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-seaweed-s3
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: seaweedfs
+  port:
+    targetPort: s3
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-seaweed-filer
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: seaweedfs
+  port:
+    targetPort: filer
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-seaweed-admin
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: seaweedfs
+  port:
+    targetPort: admin
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-polaris-api
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: polaris
+  port:
+    targetPort: api
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-polaris-health
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: polaris
+  port:
+    targetPort: management
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-alloy
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: alloy
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

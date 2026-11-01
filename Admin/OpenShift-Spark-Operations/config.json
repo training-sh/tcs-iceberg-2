@@ -1,0 +1,16 @@
+{
+  "namespace": "bigdata",
+  "spark_master": "spark://spark-master:7077",
+  "s3_endpoint": "http://seaweedfs:8333",
+  "bucket": "warehouse",
+  "temporary_prefix": "operations-workshop",
+  "polaris_uri": "http://polaris:8181/api/catalog",
+  "polaris_warehouse": "training",
+  "event_log_directory": "s3a://warehouse/spark-events",
+  "credential_environment": {
+    "s3_access_key": "AWS_ACCESS_KEY_ID",
+    "s3_secret_key": "AWS_SECRET_ACCESS_KEY",
+    "polaris_client_id": "POLARIS_CLIENT_ID",
+    "polaris_client_secret": "POLARIS_CLIENT_SECRET"
+  }
+}

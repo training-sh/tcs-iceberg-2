@@ -1,0 +1,155 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-jupyter
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: spark-master
+  port:
+    targetPort: jupyter
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-spark-master
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: spark-master
+  port:
+    targetPort: master-ui
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-spark-history
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: spark-master
+  port:
+    targetPort: history-ui
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-spark-driver
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: spark-master
+  port:
+    targetPort: driver-ui
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ops-spark-worker-0
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: spark-worker-0
+  ports:
+  - name: worker-ui
+    port: 8081
+    targetPort: worker-ui
+    protocol: TCP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-spark-worker-0
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: ops-spark-worker-0
+  port:
+    targetPort: worker-ui
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-grafana
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: grafana
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-loki
+  namespace: bigdata
+  labels:
+    app.kubernetes.io/part-of: spark-operations-workshop
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: loki
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
