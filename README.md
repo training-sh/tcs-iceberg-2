@@ -25,6 +25,14 @@ cd tcs-iceberg-2
 oc -n bigdata port-forward --address=127.0.0.1 service/spark-master 18888:8888
 ```
 
+
+on new VMs assigned, crc start will show degraded warning, crc start as like running long time.
+
+After crc start, you can open new terminal and copy credentials.
+
+
+
+
 On Terminal 2
 
 ```
