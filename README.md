@@ -42,10 +42,14 @@ next terminal for spark master
 
 On new Terminal 
 
+```
 okd-env
 
 cd tcs-iceberg-2
 oc -n bigdata port-forward --address=127.0.0.1 service/spark-master 28080:8080
+```
+
+
 
 open in browser http://127.0.0.1:28080
 
