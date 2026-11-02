@@ -3,6 +3,14 @@
 
 https://codepad.pro/pad/IBd6pJ_iW7VX
 
+# git clone
+
+Open Terminal
+
+```
+git clone https://github.com/training-sh/tcs-iceberg-2
+```
+
 
 # Port Forward
 
