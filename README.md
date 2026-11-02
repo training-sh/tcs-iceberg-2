@@ -11,6 +11,19 @@ Open Terminal
 git clone https://github.com/training-sh/tcs-iceberg-2
 ```
 
+open terminal
+```
+oc logout
+```
+
+```
+crc console --credentials
+```
+
+copy admin part of the command
+
+
+oc login -u kubeadmin -p password https://api.crc.testing:6443
 
 # Port Forward
 
