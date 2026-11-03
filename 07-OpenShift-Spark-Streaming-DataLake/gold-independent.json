@@ -1,0 +1,10 @@
+{
+  "role": "gold",
+  "application_id": "app-20261103142143-0018",
+  "checks": [
+    "fresh driver resumed original checkpoint",
+    "two independent recurring Spark applications",
+    "signed S3 API replay left business totals unchanged",
+    "Gold callback executed twice with same batch ID; no double counting"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "role": "bronze",
+  "application_id": "app-20261103142142-0017",
+  "checks": [
+    "fresh driver resumed original checkpoint",
+    "two independent recurring Spark applications",
+    "signed S3 API replay left business totals unchanged"
+  ]
+}
