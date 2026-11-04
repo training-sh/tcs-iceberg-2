@@ -1,0 +1,22 @@
+# Optional HTTPS UI/API endpoint. A Route does not configure Trino authentication.
+# Enable and verify the password profile before exposing this endpoint.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: trino
+  namespace: bigdata
+  annotations:
+    haproxy.router.openshift.io/timeout: 5m
+    haproxy.router.openshift.io/set-forwarded-headers: replace
+spec:
+  host: trino-bigdata.apps-crc.testing
+  to:
+    kind: Service
+    name: trino
+    weight: 100
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

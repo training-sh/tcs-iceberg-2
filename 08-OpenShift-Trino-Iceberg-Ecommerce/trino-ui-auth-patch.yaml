@@ -1,0 +1,41 @@
+# Strategic merge patch for the existing coordinator, not a standalone StatefulSet.
+# Applying this patch changes the pod template and restarts Trino.
+spec:
+  template:
+    spec:
+      containers:
+        - name: trino
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              cp -R /etc/trino/. /tmp/trino-course-auth/
+              grep -v -E '^(http-server.authentication.type|http-server.process-forwarded|internal-communication.shared-secret)=' /etc/trino/config.properties > /tmp/trino-course-auth/config.properties || test "$?" -eq 1
+              printf '\n' >> /tmp/trino-course-auth/config.properties
+              cat /opt/trino-course-auth/authentication.properties >> /tmp/trino-course-auth/config.properties
+              cp /opt/trino-course-auth/password-authenticator.properties /tmp/trino-course-auth/password-authenticator.properties
+              exec /usr/lib/trino/bin/launcher run --etc-dir /tmp/trino-course-auth "-Dnode.id=${HOSTNAME}"
+          env:
+            - name: TRINO_INTERNAL_SHARED_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: trino-internal-auth
+                  key: shared-secret
+          volumeMounts:
+            - name: course-auth-config
+              mountPath: /opt/trino-course-auth
+              readOnly: true
+            - name: course-passwords
+              mountPath: /etc/trino-passwords
+              readOnly: true
+            - name: course-auth-runtime
+              mountPath: /tmp/trino-course-auth
+      volumes:
+        - name: course-auth-config
+          configMap:
+            name: trino-course-auth-config
+        - name: course-passwords
+          secret:
+            secretName: trino-ui-passwords
+        - name: course-auth-runtime
+          emptyDir: {}

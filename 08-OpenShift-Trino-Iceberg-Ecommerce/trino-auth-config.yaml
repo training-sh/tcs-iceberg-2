@@ -1,0 +1,16 @@
+# Optional password profile. Requires the separately created Secrets from lesson 05.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-course-auth-config
+  namespace: bigdata
+data:
+  authentication.properties: |
+    http-server.authentication.type=PASSWORD
+    http-server.process-forwarded=true
+    internal-communication.shared-secret=${ENV:TRINO_INTERNAL_SHARED_SECRET}
+  worker-authentication.properties: |
+    internal-communication.shared-secret=${ENV:TRINO_INTERNAL_SHARED_SECRET}
+  password-authenticator.properties: |
+    password-authenticator.name=file
+    file.password-file=/etc/trino-passwords/password.db

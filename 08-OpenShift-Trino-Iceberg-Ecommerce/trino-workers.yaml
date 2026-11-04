@@ -1,0 +1,145 @@
+# Optional scale-out demonstration. Review before applying; creates zero worker pods.
+# Keep image/version, environment and Secret refs aligned with the current coordinator.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-course-worker-config
+  namespace: bigdata
+data:
+  config.properties: |
+    coordinator=false
+    http-server.http.port=8080
+    discovery.uri=http://trino:8080
+    query.max-memory=256MB
+    query.max-memory-per-node=256MB
+    memory.heap-headroom-per-node=256MB
+  node.properties: |
+    node.environment=training
+    node.data-dir=/data/trino
+  jvm.config: |
+    -server
+    -Xmx768M
+    -XX:+UseG1GC
+    -XX:+ExitOnOutOfMemoryError
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino-worker-headless
+  namespace: bigdata
+spec:
+  clusterIP: None
+  selector:
+    app: trino-worker
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: trino-worker
+  namespace: bigdata
+spec:
+  serviceName: trino-worker-headless
+  replicas: 0
+  selector:
+    matchLabels:
+      app: trino-worker
+  template:
+    metadata:
+      labels:
+        app: trino-worker
+    spec:
+      serviceAccountName: bigdata-workloads
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      enableServiceLinks: false
+      containers:
+        - name: trino
+          image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-trino@sha256:2fd6f7cc6605eb0e61cc7bf1bd5c0febb9430a4fea57faa335c68a283b940873
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: MYSQL_HOST
+              value: mysql
+            - name: POSTGRES_HOST
+              value: postgres
+            - name: HIVE_METASTORE_HOST
+              value: hive-metastore.bigdata.svc.cluster.local
+            - name: S3_ENDPOINT
+              value: http://seaweedfs:8333
+            - name: POLARIS_URI
+              value: http://polaris:8181/api/catalog
+            - name: DB_USER
+              value: team
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lab-credentials
+                  key: database-password
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lab-credentials
+                  key: s3-access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: lab-credentials
+                  key: s3-secret-key
+            - name: POLARIS_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lab-credentials
+                  key: polaris-client-id
+            - name: POLARIS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: lab-credentials
+                  key: polaris-client-secret
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              cpu: '1'
+              memory: 1536Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /etc/trino/config.properties
+              subPath: config.properties
+              readOnly: true
+            - name: config
+              mountPath: /etc/trino/node.properties
+              subPath: node.properties
+              readOnly: true
+            - name: config
+              mountPath: /etc/trino/jvm.config
+              subPath: jvm.config
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /v1/info
+              port: http
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /v1/info
+              port: http
+            periodSeconds: 10
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: trino-course-worker-config
