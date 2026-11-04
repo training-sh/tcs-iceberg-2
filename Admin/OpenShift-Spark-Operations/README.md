@@ -281,6 +281,37 @@ Each Route uses HTTPS edge termination with HTTP redirected to HTTPS. The router
 
 The worker Service selects `spark-worker-0` by its StatefulSet pod-name label. This keeps executor log links on that worker when more workers exist. A route to the original shared `spark-worker` Service could otherwise send successive requests to different workers. For another worker, copy that Service/Route pair and change both object names and the pod-name selector to the corresponding worker ordinal.
 
+
+For those who has not done hands on for creating seaweed fs route only
+
+```
+cat > routes-seweedfs.yaml <<'YAML'
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ops-seaweed-admin
+  namespace: bigdata
+spec:
+  to:
+    kind: Service
+    name: seaweedfs
+  port:
+    targetPort: admin
+  wildcardPolicy: None
+YAML
+
+```
+
+```
+oc apply -f routes-seweedfs.yaml
+```
+
+```
+oc -n bigdata get route ops-seaweed-admin \
+  -o jsonpath='http://{.spec.host}{"\n"}'
+```
+
+
 ### Validate and apply using oc
 
 Run these commands only when you intend to create the routes in your own lab. The supplied YAML was server-dry-run validated during preparation; it has not been applied to the reference cluster.
