@@ -188,3 +188,81 @@ else:
 ```
 
 Do not use Run All to send successive phases. Run the chosen send cell explicitly. The producer closes its connection after each call. A delivery error can leave ambiguous delivery; inspect before retrying. Stable line IDs protect Silver from identical re-publication, not from all possible business corrections.
+
+## Optional: generate invoices every five seconds
+
+Run the settings, Python client installation/version check, producer-function definitions and topic setup above first. This single cell generates invoices and calls the existing `send_records` function; no additional client or helper file is needed. It uses the existing `TOPIC` and `BOOTSTRAP` settings.
+
+Each invoice has 3–10 item lines with the same invoice number, customer, country and timestamp. Each line has its own `LineID`. Timestamps use the pipeline's `yyyy-MM-dd HH:mm:ss` format, identifiers are strings and prices are decimal strings. Country is the Kafka key, as in the earlier producer.
+
+The default is 20 invoices, with a five-second pause between invoices. Set `SAMPLES = None` to continue until **Interrupt Kernel** (the square stop button), or choose a larger finite count. The pause follows acknowledgement of all lines, so delivery time adds to the interval. This cell starts no Spark application and does not create or alter a topic.
+
+Use a new explicit `RUN_LABEL` for each new generated run, or set `START_INVOICE` to the next unused number. Do not reuse a generated LineID with different random content: notebook 03 deliberately rejects conflicting immutable lines. The printed next number is useful after a clean run, but interrupted delivery can be ambiguous; use a new label after interruption or delivery failure.
+
+**Run this after completing the fixed A/B acceptance checks.** Generated input changes the expected Bronze/Silver counts and country totals; 175.00/225.00 are no longer the expected totals. Start this cell in its own producer kernel while inspecting arrivals with notebook 02 or notebook 03's optional live mode. Keep Spark applications sequential as before. Stop the producer before draining the stream; with finite ingestion, rerun AvailableNow after production finishes.
+
+```python
+# Generate complete invoices using the existing producer function.
+import random
+import time
+from datetime import datetime, timezone
+
+SAMPLES = 20            # Number of invoices; None = run until Interrupt Kernel.
+DELAY = 5               # Seconds to pause between acknowledged invoices.
+RUN_LABEL = "live01"    # Change explicitly for a new run; no random topic/run IDs.
+START_INVOICE = 10000   # First unused invoice number within this RUN_LABEL.
+
+countries = [
+    "USA", "CA", "IN", "AT", "BE", "BG", "HR", "CY",
+    "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU",
+    "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL",
+    "PT", "RO", "SK", "SI", "ES", "SE",
+]
+stock_codes = ["85123A", "71053", "84406B", "84406G", "84406E"]
+customer_codes = ["17850", "13047", "12583"]
+
+if SAMPLES is not None and (not isinstance(SAMPLES, int) or SAMPLES <= 0):
+    raise ValueError("SAMPLES must be a positive integer or None")
+if DELAY < 0 or START_INVOICE < 0 or not RUN_LABEL.strip():
+    raise ValueError("Use a nonnegative delay/start number and a nonblank RUN_LABEL")
+
+invoices_sent = 0
+lines_sent = 0
+try:
+    while SAMPLES is None or invoices_sent < SAMPLES:
+        invoice_number = START_INVOICE + invoices_sent
+        invoice_no = f"LIVE-{RUN_LABEL}-{invoice_number}"
+        country = random.choice(countries)
+        customer = random.choice(customer_codes)
+        invoice_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        number_of_items = random.randint(3, 10)
+        records = []
+        for item_number in range(1, number_of_items + 1):
+            stock_code = random.choice(stock_codes)
+            records.append({
+                "LineID": f"{invoice_no}-{item_number:02d}",
+                "InvoiceNo": invoice_no,
+                "StockCode": stock_code,
+                "Quantity": random.randint(1, 10),
+                "Description": f"Product {stock_code}",
+                "InvoiceDate": invoice_date,
+                "UnitPrice": f"{random.randint(1, 5)}.00",
+                "CustomerID": customer,
+                "Country": country,
+            })
+
+        acknowledged = send_records(records, topic=TOPIC, bootstrap_servers=BOOTSTRAP)
+        invoices_sent += 1
+        lines_sent += len(acknowledged)
+        print("INVOICE_SENT", invoice_no, "country", country,
+              "lines", len(acknowledged), "total_lines", lines_sent)
+        if SAMPLES is None or invoices_sent < SAMPLES:
+            time.sleep(DELAY)
+except KeyboardInterrupt:
+    print("Producer interrupted. Use a new RUN_LABEL before another generated run.")
+finally:
+    # send_records closes its Kafka producer in finally, including interruption.
+    print("Completed invoices:", invoices_sent, "acknowledged lines:", lines_sent)
+    print("Next invoice number after completed invoices:", START_INVOICE + invoices_sent)
+
+```
