@@ -1,5 +1,49 @@
 # troubleshoot
 
+refer start-stop.md to stop yarn and other not used components
+
+Troubleshooting lab
+
+crc stop
+or 
+crc stop --force
+
+--
+for terminal
+
+renew tokens
+
+crc console --credentials
+
+copy the oc login for kubeadmin
+
+oc whoami
+
+kubeadmin
+
+--
+
+crc start
+
+
+degrade warning, wait for 2-3 minutes
+-----
+
+crc start 
+
+console url 
+
+login as kubeadmin
+
+--
+
+Close as many google chrome tab
+
+----
+
+
+
+
 ```
 oc get co
 ```
