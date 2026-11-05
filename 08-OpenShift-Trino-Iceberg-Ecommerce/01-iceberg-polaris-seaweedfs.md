@@ -4,7 +4,7 @@
 
 ## 1. Follow a table lookup
 
-```mermaid
+``` 
 sequenceDiagram
     participant T as Trino
     participant P as Polaris REST catalog
