@@ -22,6 +22,12 @@ Run one pipeline at a time. Do not run the command-line and Airflow pipelines co
 
 ## Step 1: Download and open the exercise
 
+
+Download this file, on step 1, you need to map the files based on extracted directory .
+
+https://github.com/training-sh/tcs-iceberg-2/blob/main/data/ml-latest-small%20(3).zip
+
+
 Download `movielens-classroom.zip` from the exercise repository and save it in `~/Downloads`. Extract and open it:
 
 ```bash
