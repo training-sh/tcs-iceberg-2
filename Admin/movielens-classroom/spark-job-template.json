@@ -1,0 +1,147 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "movielens-classroom-template",
+    "namespace": "bigdata",
+    "labels": {
+      "app": "movielens-classroom"
+    }
+  },
+  "spec": {
+    "backoffLimit": 0,
+    "activeDeadlineSeconds": 900,
+    "ttlSecondsAfterFinished": 3600,
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "movielens-classroom"
+        }
+      },
+      "spec": {
+        "restartPolicy": "Never",
+        "serviceAccountName": "bigdata-workloads",
+        "enableServiceLinks": false,
+        "securityContext": {
+          "fsGroup": 185,
+          "runAsGroup": 185,
+          "runAsUser": 185
+        },
+        "containers": [
+          {
+            "name": "pipeline",
+            "image": "image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-spark@sha256:9a7752bfdaacb6886abdbdbcf4aafd3830dad75e8385e0281882e1916cc2ed8a",
+            "args": [
+              "submit",
+              "--master",
+              "spark://spark-master:7077",
+              "--driver-memory",
+              "512m",
+              "--conf",
+              "spark.driver.host=$(POD_IP)",
+              "--conf",
+              "spark.driver.bindAddress=0.0.0.0",
+              "/workspace/movielens-classroom/01_upload_bronze.py"
+            ],
+            "env": [
+              {
+                "name": "POD_IP",
+                "valueFrom": {
+                  "fieldRef": {
+                    "fieldPath": "status.podIP"
+                  }
+                }
+              },
+              {
+                "name": "S3_ENDPOINT",
+                "value": "http://seaweedfs:8333"
+              },
+              {
+                "name": "POLARIS_URI",
+                "value": "http://polaris:8181/api/catalog"
+              },
+              {
+                "name": "AWS_ACCESS_KEY_ID",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "lab-credentials",
+                    "key": "s3-access-key"
+                  }
+                }
+              },
+              {
+                "name": "AWS_SECRET_ACCESS_KEY",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "lab-credentials",
+                    "key": "s3-secret-key"
+                  }
+                }
+              },
+              {
+                "name": "POLARIS_CLIENT_ID",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "lab-credentials",
+                    "key": "polaris-client-id"
+                  }
+                }
+              },
+              {
+                "name": "POLARIS_CLIENT_SECRET",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "lab-credentials",
+                    "key": "polaris-client-secret"
+                  }
+                }
+              },
+              {
+                "name": "DB_USER",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "lab-credentials",
+                    "key": "database-user"
+                  }
+                }
+              },
+              {
+                "name": "DB_PASSWORD",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "lab-credentials",
+                    "key": "database-password"
+                  }
+                }
+              }
+            ],
+            "resources": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "512Mi"
+              },
+              "limits": {
+                "cpu": "1",
+                "memory": "1536Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "notebooks",
+                "mountPath": "/workspace"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "notebooks",
+            "persistentVolumeClaim": {
+              "claimName": "spark-notebooks"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
