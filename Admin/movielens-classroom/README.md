@@ -1,5 +1,34 @@
 # MovieLens classroom: Spark, SeaweedFS, Iceberg and MySQL
 
+codepad notes
+
+```
+
+Assignment
+
+read https://github.com/training-sh/tcs-iceberg-2/tree/main/Admin/movielens-classroom
+
+Ensure to run movielens end to end flow using airflow
+
+Mysql
+S3
+Polaris
+Spark
+Airflow
+
+After you run the DAG/pipeline successfully,
+
+Manual Check 
+
+login into mysql  oc... exec -it mysql (hint)
+check the gold table
+
+similary use trino, and polaris, to query data from silver and gold movie lens data
+
+trino >   show catalogs, show tables, find silver and gold tables for movielens, and list the data
+
+```
+
 Follow the numbered steps in order. Use the supplied files unchanged. You do not need to write code, create notebooks, or solve configuration problems.
 
 The exercise is a self-contained download. Extract or clone it into any directory and follow the numbered commands.
