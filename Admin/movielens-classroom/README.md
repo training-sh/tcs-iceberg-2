@@ -25,6 +25,10 @@ Run one pipeline at a time. Do not run the command-line and Airflow pipelines co
 
 Download this file, on step 1, you need to map the files based on extracted directory .
 
+bundle is located here, it has all the source of this folder
+
+https://github.com/training-sh/tcs-iceberg-2/blob/main/Admin/movielens-classroom/movielens-classroom.zip
+
 https://github.com/training-sh/tcs-iceberg-2/blob/main/data/ml-latest-small%20(3).zip
 
 
