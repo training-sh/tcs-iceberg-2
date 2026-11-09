@@ -2,6 +2,8 @@
 
 **Outcome:** inspect the existing Airflow service, publish paused DAGs and trigger a read-only Trino validation DAG. Read the [README](README.md) and complete the preceding Trino ecommerce course first. Expected baseline: 8 completed lines, 5 orders and 225.00 CU.
 
+If the initial Iceberg Bronze seed exists but the MySQL source or incremental refresh is missing, publish the files and run the supplied `python3 prepare-ecommerce-data.py` command before triggering this DAG. It must finish with `ECOMMERCE_DATA_READY`.
+
 Use [the introduction](00-airflow-introduction.md) first for architecture, source creation with `cat`, the basic dependency graph and the UI/log walkthrough. The code below is premade; publishing it does not execute its tasks.
 
 ## 1. Separate orchestration from execution

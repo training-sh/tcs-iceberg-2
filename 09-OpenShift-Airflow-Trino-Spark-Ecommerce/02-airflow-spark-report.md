@@ -4,6 +4,8 @@
 
 For the component roles, the meaning of spark-submit and the difference between Airflow/Spark/OpenShift schedulers, use [the introduction](00-airflow-introduction.md). The Spark script and DAG are already provided; trigger the existing definition rather than starting a second Spark submission manually.
 
+Before triggering, the course MySQL source and Silver data must both contain eight completed lines, five orders and 225.00 revenue. If only the initial Iceberg seed has been prepared, run `python3 prepare-ecommerce-data.py` from the exercise directory after publishing. Expect `ECOMMERCE_DATA_READY`, then run lesson 01's checks. The `prepare` task validates these inputs; it does not create the missing source dataset.
+
 ## 1. Understand the task graph and process boundary
 
 ```mermaid

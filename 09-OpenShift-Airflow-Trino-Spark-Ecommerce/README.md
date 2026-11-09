@@ -4,6 +4,36 @@ Start with the independent [Airflow getting-started exercise](../../airflow-gett
 
 Start with [the Airflow introduction](00-airflow-introduction.md): it needs only the existing Airflow and Trino services, and checks 25 TPCH nations. Before data exercises 01–03, complete all three [Trino ecommerce lessons](../08-OpenShift-Trino-Iceberg-Ecommerce/README.md). Their expected input is eight completed lines, five orders and 225.00 CU.
 
+## Publish after downloading
+
+Download or clone the complete exercise into any directory. Open a terminal in that directory and run:
+
+```bash
+export EXERCISE_DIR="$(pwd)"
+bash publish-course.sh
+```
+
+The script resolves its own directory and copies the supplied files into the existing Kubernetes pods. It does not require an `~/openshift` directory or trigger any DAG runs. Keep the course DAGs idle while publishing. The prepared services and an authenticated `oc` command are required.
+
+## Prepare the ecommerce data before lessons 01–03
+
+The introduction needs only Airflow and Trino. The advanced lessons also need matching MySQL source tables and completed Silver/Gold data. If the preceding Iceberg lesson's Bronze seed is already present, run this supplied preparation command after publication:
+
+```bash
+export PATH="$HOME/.crc/bin/oc:$PATH"
+python3 prepare-ecommerce-data.py
+```
+
+Expected final output:
+
+```text
+ECOMMERCE_DATA_READY: 8 lines / 5 orders / 4 groups / 225.00
+```
+
+This creates the missing dedicated MySQL database/tables from the existing course Bronze seed, inserts the documented incremental order if absent, and runs the Bronze, Silver and Gold MERGEs. It checks existing rows before reusing them and does not drop tables. Run it only while the course DAGs are idle. The existing MySQL administrative credential is used for the scoped database setup; no password is printed or embedded in the script.
+
+If the Bronze seed is absent, complete the preceding Trino Iceberg lesson first. A `prepare` task failure does not mean Airflow needs restarting: it may mean the required source dataset is missing or incomplete.
+
 | Lesson | DAG | Result |
 |---|---|---|
 | [00: Airflow introduction](00-airflow-introduction.md) | `course_00_hello_trino` | Architecture, dependencies, provided Python/SQL files, UI and task logs |
@@ -48,6 +78,7 @@ JupyterLab can edit `.py` files too, but its `/workspace` is a separate notebook
 | [dags/airflow_hello_trino.py](dags/airflow_hello_trino.py) | Three-task introduction DAG |
 | [dags/sql/hello_trino.sql](dags/sql/hello_trino.sql) | Small read-only Trino query |
 | [publish-course.sh](publish-course.sh) | Publish premade files from the host without triggering work |
+| [prepare-ecommerce-data.py](prepare-ecommerce-data.py) | Prepare and reconcile the required ecommerce dataset from the preceding Bronze seed |
 | [dags/airflow_ecomm_dags.py](dags/airflow_ecomm_dags.py) | Three manual Airflow 3 TaskFlow DAGs |
 | [dags/course_airflow_ecomm/settings.py](dags/course_airflow_ecomm/settings.py) | Run suffix and expected totals |
 | `dags/course_airflow_ecomm/sql.py` | Trino SQL |
