@@ -1,0 +1,143 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweedfs
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: seaweedfs
+  ports:
+  - name: s3
+    port: 8333
+    targetPort: 8333
+  - name: admin
+    port: 23646
+    targetPort: 23646
+  - name: master
+    port: 9333
+    targetPort: 9333
+  - name: master-grpc
+    port: 19333
+    targetPort: 19333
+  - name: volume
+    port: 9340
+    targetPort: 9340
+  - name: volume-grpc
+    port: 19340
+    targetPort: 19340
+  - name: filer
+    port: 8888
+    targetPort: 8888
+  - name: filer-grpc
+    port: 18888
+    targetPort: 18888
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seaweedfs-data
+  namespace: olist-seller-ops
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: seaweedfs
+  namespace: olist-seller-ops
+spec:
+  serviceName: seaweedfs
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seaweedfs
+  template:
+    metadata:
+      labels:
+        app: seaweedfs
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: seaweedfs
+        image: docker.io/chrislusf/seaweedfs@sha256:ce9e796f1fe6f06968f4c04bdaf8f678dad9c8acdfef3d244133d71bfa6bf882
+        args:
+        - mini
+        - -dir=/data
+        - -ip=seaweedfs
+        - -ip.bind=0.0.0.0
+        - -master.telemetry=false
+        - -bucket=warehouse
+        - -s3.config=/etc/seaweedfs-s3/s3.json
+        - -admin.user=$(AWS_ACCESS_KEY_ID)
+        - -admin.password=$(AWS_SECRET_ACCESS_KEY)
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-secret-key
+        - name: GOMEMLIMIT
+          value: 128MiB
+        - name: GOGC
+          value: '50'
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: '1'
+            memory: 1Gi
+        startupProbe:
+          tcpSocket:
+            port: 8333
+          failureThreshold: 60
+          periodSeconds: 5
+          timeoutSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 8333
+          periodSeconds: 5
+          timeoutSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8333
+          periodSeconds: 10
+          failureThreshold: 6
+          timeoutSeconds: 10
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: s3-credentials
+          mountPath: /etc/seaweedfs-s3
+          readOnly: true
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: seaweedfs-data
+      - name: s3-credentials
+        secret:
+          secretName: seaweedfs-s3-credentials
+      serviceAccountName: olist-workloads
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault

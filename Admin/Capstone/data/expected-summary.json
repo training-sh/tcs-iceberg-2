@@ -1,0 +1,22 @@
+{
+  "inputs": {
+    "sellers": 3095,
+    "items": 3379,
+    "orders": 3000
+  },
+  "outputs": {
+    "seller_activity": 3095,
+    "seller_geography": 23
+  },
+  "totals": {
+    "distinct_orders": 3007,
+    "item_rows": 3379,
+    "delivered_orders": 2947,
+    "canceled_orders": 11,
+    "other_orders": 49,
+    "on_time_items": 3022,
+    "late_items": 321,
+    "missing_handoff_items": 36,
+    "merchandise_value": "390764.28"
+  }
+}

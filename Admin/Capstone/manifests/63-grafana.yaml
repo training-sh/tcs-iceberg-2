@@ -1,0 +1,152 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: olist-seller-ops
+data:
+  datasources.yaml: "apiVersion: 1\ndatasources:\n- access: proxy\n  isDefault: true\n\
+    \  name: Metrics\n  type: prometheus\n  uid: metrics\n  url: http://prometheus:9090\n\
+    - access: proxy\n  name: Logs\n  type: loki\n  uid: logs\n  url: http://loki:3100\n"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-providers
+  namespace: olist-seller-ops
+data:
+  dashboards.yaml: "apiVersion: 1\nproviders:\n- name: olist\n  options:\n    path:\
+    \ /dashboards\n  type: file\n"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard
+  namespace: olist-seller-ops
+data:
+  olist.json: '{"uid": "olist-ops", "title": "Olist Seller Operations", "schemaVersion":
+    39, "version": 1, "refresh": "15s", "time": {"from": "now-24h", "to": "now"},
+    "panels": [{"id": 1, "type": "stat", "title": "Last job success", "datasource":
+    {"type": "prometheus", "uid": "metrics"}, "gridPos": {"x": 0, "y": 0, "w": 8,
+    "h": 6}, "targets": [{"expr": "olist_job_success", "refId": "A"}]}, {"id": 2,
+    "type": "stat", "title": "Job seconds", "datasource": {"type": "prometheus", "uid":
+    "metrics"}, "gridPos": {"x": 8, "y": 0, "w": 8, "h": 6}, "targets": [{"expr":
+    "olist_job_duration_seconds", "refId": "A"}]}, {"id": 3, "type": "stat", "title":
+    "Input items", "datasource": {"type": "prometheus", "uid": "metrics"}, "gridPos":
+    {"x": 16, "y": 0, "w": 8, "h": 6}, "targets": [{"expr": "olist_input_items", "refId":
+    "A"}]}, {"id": 4, "type": "stat", "title": "Output rows", "datasource": {"type":
+    "prometheus", "uid": "metrics"}, "gridPos": {"x": 0, "y": 6, "w": 8, "h": 6},
+    "targets": [{"expr": "olist_output_rows", "refId": "A"}]}, {"id": 5, "type": "stat",
+    "title": "Scrape health", "datasource": {"type": "prometheus", "uid": "metrics"},
+    "gridPos": {"x": 8, "y": 6, "w": 8, "h": 6}, "targets": [{"expr": "up", "refId":
+    "A"}]}, {"id": 6, "type": "logs", "title": "Namespace workload logs", "datasource":
+    {"type": "loki", "uid": "logs"}, "gridPos": {"x": 0, "y": 12, "w": 24, "h": 10},
+    "targets": [{"expr": "{namespace=\"olist-seller-ops\"}", "refId": "A"}]}]}'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: grafana
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: olist-seller-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      serviceAccountName: olist-workloads
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: grafana
+        image: grafana/grafana:13.2.0@sha256:3fd54ae1214669f8355f065ec9f6445d5279a3d77095ab048ca045685272429b
+        args: []
+        ports:
+        - name: http
+          containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: '1'
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          periodSeconds: 10
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/grafana
+        - name: sources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: providers
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: dashboard
+          mountPath: /dashboards
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-login
+              key: password
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: 'false'
+        - name: GF_PLUGINS_PREINSTALL_DISABLED
+          value: 'true'
+        - name: GF_ANALYTICS_REPORTING_ENABLED
+          value: 'false'
+        - name: GF_ANALYTICS_CHECK_FOR_UPDATES
+          value: 'false'
+        - name: GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES
+          value: 'false'
+        - name: GF_UNIFIED_ALERTING_ENABLED
+          value: 'false'
+        startupProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 60
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: sources
+        configMap:
+          name: grafana-datasources
+      - name: providers
+        configMap:
+          name: grafana-providers
+      - name: dashboard
+        configMap:
+          name: grafana-dashboard

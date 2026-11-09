@@ -1,0 +1,84 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seller-process
+  namespace: olist-seller-ops
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 1200
+  template:
+    metadata:
+      labels:
+        app: seller-job
+    spec:
+      serviceAccountName: olist-workloads
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: seller-job
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-spark@sha256:9a7752bfdaacb6886abdbdbcf4aafd3830dad75e8385e0281882e1916cc2ed8a
+        args:
+        - submit
+        - --master
+        - spark://spark-master:7077
+        - --driver-memory
+        - 512m
+        - /app/seller_ops.py
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-secret-key
+        - name: POLARIS_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-client-id
+        - name: POLARIS_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-client-secret
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        envFrom:
+        - configMapRef:
+            name: seller-settings
+        resources:
+          requests:
+            cpu: 100m
+            memory: 768Mi
+          limits:
+            cpu: '2'
+            memory: 1536Mi
+        volumeMounts:
+        - name: code
+          mountPath: /app
+        - name: work
+          mountPath: /data
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: code
+        configMap:
+          name: seller-code
+      - name: work
+        emptyDir: {}

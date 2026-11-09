@@ -1,0 +1,189 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-config
+  namespace: olist-seller-ops
+data:
+  loki.yaml: "auth_enabled: false\nserver:\n  http_listen_port: 3100\ncommon:\n  path_prefix:\
+    \ /loki\n  replication_factor: 1\n  ring:\n    instance_addr: 127.0.0.1\n    kvstore:\n\
+    \      store: inmemory\n  storage:\n    filesystem:\n      chunks_directory: /loki/chunks\n\
+    \      rules_directory: /loki/rules\nschema_config:\n  configs:\n  - from: 2024-01-01\n\
+    \    store: tsdb\n    object_store: filesystem\n    schema: v13\n    index:\n\
+    \      prefix: index_\n      period: 24h\nstorage_config:\n  tsdb_shipper:\n \
+    \   active_index_directory: /loki/index\n    cache_location: /loki/index-cache\n\
+    compactor:\n  working_directory: /loki/compactor\n  compaction_interval: 10m\n\
+    \  retention_enabled: true\n  retention_delete_delay: 2h\n  delete_request_store:\
+    \ filesystem\nlimits_config:\n  retention_period: 24h\n  ingestion_rate_mb: 1\n\
+    \  ingestion_burst_size_mb: 2\n  max_query_parallelism: 2\n  reject_old_samples_max_age:\
+    \ 24h\nquerier:\n  max_concurrent: 2\nchunk_store_config:\n  chunk_cache_config:\n\
+    \    embedded_cache:\n      enabled: true\n      max_size_mb: 32\nquery_range:\n\
+    \  cache_results: false\nanalytics:\n  reporting_enabled: false\n"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: loki
+  ports:
+  - name: http
+    port: 3100
+    targetPort: 3100
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki
+  namespace: olist-seller-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loki
+  template:
+    metadata:
+      labels:
+        app: loki
+    spec:
+      serviceAccountName: olist-workloads
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: loki
+        image: grafana/loki:3.7.0@sha256:c316b7c7589a5eeca843b6926c7446149d18300b79ac8538dc4ae063bc478da2
+        command:
+        - /usr/bin/loki
+        args:
+        - -config.file=/etc/loki/loki.yaml
+        ports:
+        - name: http
+          containerPort: 3100
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        readinessProbe:
+          tcpSocket:
+            port: 3100
+          initialDelaySeconds: 5
+        volumeMounts:
+        - name: config
+          mountPath: /etc/loki
+        - name: data
+          mountPath: /loki
+      volumes:
+      - name: config
+        configMap:
+          name: loki-config
+      - name: data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: log-reader
+  namespace: olist-seller-ops
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: read-pod-logs
+  namespace: olist-seller-ops
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  - pods/log
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pod-logs
+  namespace: olist-seller-ops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: read-pod-logs
+subjects:
+- kind: ServiceAccount
+  name: log-reader
+  namespace: olist-seller-ops
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-collector
+  namespace: olist-seller-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-collector
+  template:
+    metadata:
+      labels:
+        app: log-collector
+    spec:
+      serviceAccountName: log-reader
+      automountServiceAccountToken: true
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: log-collector
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-spark@sha256:9a7752bfdaacb6886abdbdbcf4aafd3830dad75e8385e0281882e1916cc2ed8a
+        command:
+        - python3
+        args:
+        - /app/collect_logs.py
+        ports:
+        - name: http
+          containerPort: 8001
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - name: code
+          mountPath: /app
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      volumes:
+      - name: code
+        configMap:
+          name: seller-code

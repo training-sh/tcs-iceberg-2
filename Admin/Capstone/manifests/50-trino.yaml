@@ -1,0 +1,186 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-runtime
+  namespace: olist-seller-ops
+data:
+  jvm.config: '-server
+
+    -Xmx384M
+
+    -XX:+UseG1GC
+
+    -XX:+ExitOnOutOfMemoryError
+
+    '
+  config.properties: 'coordinator=true
+
+    node-scheduler.include-coordinator=true
+
+    http-server.http.port=8080
+
+    discovery.uri=http://trino:8080
+
+    query.max-memory=96MB
+
+    query.max-memory-per-node=96MB
+
+    memory.heap-headroom-per-node=96MB
+
+    log.console-format=JSON
+
+    openmetrics.jmx-object-names=io.trino.execution:*|io.trino.memory:*|io.trino.metadata:*|io.trino.hdfs:*|java.lang:type=Memory
+
+
+    '
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino
+  namespace: olist-seller-ops
+  labels:
+    app: trino
+spec:
+  selector:
+    app: trino
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: trino
+  namespace: olist-seller-ops
+spec:
+  serviceName: trino
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trino
+  template:
+    metadata:
+      labels:
+        app: trino
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8080'
+    spec:
+      serviceAccountName: olist-workloads
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: trino
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-trino@sha256:2fd6f7cc6605eb0e61cc7bf1bd5c0febb9430a4fea57faa335c68a283b940873
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+        env:
+        - name: MYSQL_HOST
+          value: mysql
+        - name: POSTGRES_HOST
+          value: postgres
+        - name: HIVE_METASTORE_HOST
+          value: hive-metastore.olist-seller-ops.svc.cluster.local
+        - name: S3_ENDPOINT
+          value: http://seaweedfs:8333
+        - name: POLARIS_URI
+          value: http://polaris:8181/api/catalog
+        - name: DB_USER
+          value: team
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: database-password
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-secret-key
+        - name: POLARIS_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-client-id
+        - name: POLARIS_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-client-secret
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        resources:
+          requests:
+            cpu: 250m
+            memory: 1Gi
+          limits:
+            cpu: '2'
+            memory: 1536Mi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: runtime
+          mountPath: /etc/trino/jvm.config
+          subPath: jvm.config
+          readOnly: true
+        - name: runtime
+          mountPath: /etc/trino/config.properties
+          subPath: config.properties
+          readOnly: true
+        startupProbe:
+          exec:
+            command:
+            - /usr/lib/trino/bin/health-check
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 60
+        readinessProbe:
+          exec:
+            command:
+            - /usr/lib/trino/bin/health-check
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /v1/info
+            port: http
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      volumes:
+      - name: runtime
+        configMap:
+          name: trino-runtime
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi

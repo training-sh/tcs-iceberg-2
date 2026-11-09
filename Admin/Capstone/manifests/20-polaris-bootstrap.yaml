@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: polaris-bootstrap
+  namespace: olist-seller-ops
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: bootstrap
+        image: docker.io/apache/polaris-admin-tool@sha256:3d8a24cea57aef3b71a0d7b09e5d2278d01e7e1b30071bf6648f2a6953322cca
+        args:
+        - bootstrap
+        - -r
+        - POLARIS
+        - -c
+        - $(BOOTSTRAP_CREDENTIALS)
+        env:
+        - name: POLARIS_PERSISTENCE_TYPE
+          value: relational-jdbc
+        - name: POLARIS_PERSISTENCE_RELATIONAL_JDBC_DATABASE_TYPE
+          value: postgresql
+        - name: QUARKUS_DATASOURCE_JDBC_URL
+          value: jdbc:postgresql://postgres:5432/polaris
+        - name: QUARKUS_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: database-user
+        - name: QUARKUS_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: database-password
+        - name: BOOTSTRAP_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-bootstrap-credentials
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: '2'
+            memory: 1536Mi
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        command:
+        - java
+        - -XX:MaxRAMPercentage=50.0
+        - -jar
+        - /deployments/polaris-admin-tool.jar
+      serviceAccountName: olist-workloads
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault

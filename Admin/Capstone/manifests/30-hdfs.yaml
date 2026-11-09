@@ -1,0 +1,191 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: namenode
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: namenode
+  ports:
+  - name: rpc
+    port: 9000
+    targetPort: rpc
+  - name: web
+    port: 9870
+    targetPort: web
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: namenode
+  namespace: olist-seller-ops
+spec:
+  serviceName: namenode
+  replicas: 1
+  selector:
+    matchLabels:
+      app: namenode
+  template:
+    metadata:
+      labels:
+        app: namenode
+    spec:
+      enableServiceLinks: false
+      serviceAccountName: olist-workloads
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: namenode
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-hadoop@sha256:494a73dfb31b6cf117e588e22009da8d7446b997a5d9a6f7ec64910cdc27c2f7
+        args:
+        - namenode
+        - -Ddfs.namenode.datanode.registration.ip-hostname-check=false
+        env:
+        - name: HADOOP_HEAPSIZE_MAX
+          value: '192'
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        ports:
+        - name: rpc
+          containerPort: 9000
+        - name: web
+          containerPort: 9870
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: '1'
+            memory: 640Mi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        startupProbe:
+          tcpSocket:
+            port: web
+          periodSeconds: 10
+          failureThreshold: 90
+        readinessProbe:
+          tcpSocket:
+            port: web
+          periodSeconds: 10
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+      automountServiceAccountToken: false
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datanode
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: datanode
+  ports:
+  - name: web
+    port: 9864
+    targetPort: web
+  - name: data
+    port: 9866
+    targetPort: data
+  - name: ipc
+    port: 9867
+    targetPort: ipc
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: datanode
+  namespace: olist-seller-ops
+spec:
+  serviceName: datanode
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datanode
+  template:
+    metadata:
+      labels:
+        app: datanode
+    spec:
+      enableServiceLinks: false
+      serviceAccountName: olist-workloads
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: datanode
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-hadoop@sha256:494a73dfb31b6cf117e588e22009da8d7446b997a5d9a6f7ec64910cdc27c2f7
+        args:
+        - datanode
+        env:
+        - name: DATANODE_HOST
+          value: datanode.olist-seller-ops.svc.cluster.local
+        - name: HADOOP_HEAPSIZE_MAX
+          value: '192'
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        ports:
+        - name: web
+          containerPort: 9864
+        - name: data
+          containerPort: 9866
+        - name: ipc
+          containerPort: 9867
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: '1'
+            memory: 640Mi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        startupProbe:
+          tcpSocket:
+            port: web
+          periodSeconds: 10
+          failureThreshold: 90
+        readinessProbe:
+          tcpSocket:
+            port: web
+          periodSeconds: 10
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+      automountServiceAccountToken: false
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
