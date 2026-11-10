@@ -1,0 +1,12 @@
+{
+  "log_file": "binlog.000019",
+  "log_pos": 2911139,
+  "batch_id": 4,
+  "order_id": 14,
+  "sequence": 6,
+  "last_time": "2026-11-10 17:30:17.000005",
+  "source_uuid": "695944e5-ca9b-11f1-b26b-0a580ad9003d",
+  "database": "scd_workshop",
+  "product_rows": 1,
+  "order_rows": 2
+}

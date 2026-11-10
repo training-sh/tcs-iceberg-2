@@ -1,0 +1,3 @@
+event_id,order_id,product_id,quantity,selling_price,status,event_time,created_at
+15,1008,1,2,90.00,PAID,2026-11-10 17:30:18.087274,2026-11-10 17:30:18.087274
+16,1009,1,1,90.00,CREATED,2026-11-10 17:30:18.087274,2026-11-10 17:30:18.087274
