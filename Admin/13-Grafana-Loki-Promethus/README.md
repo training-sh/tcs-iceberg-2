@@ -30,6 +30,14 @@ The `bigdata/prometheus` Service is a native Prometheus query API proxy inside t
 
 ## 2. Start the existing optional services
 
+enable and install pods, consume memory and cpu
+
+```
+cd ~/openshift
+bash observability/enable-native.sh
+bash observability/install.sh
+```
+
 These commands start application observability without restarting CRC:
 
 ```bash
