@@ -443,6 +443,11 @@ at java.base/java.lang.Thread.run(Thread.java:829)
 SELLER_COMPUTE_PASS {"run_id": "ops_161e5eb21805", "outputs": {"seller_activity": 3095, "seller_geography": 23}, "status": "COMPUTED", "seconds": 61.25, "input_items": 3379}
 ```
 
+
+You can copy the run id  {"run_id": "ops_161e5eb21805", like ops_161e5eb21805 , which will be used for next statement. 
+
+Remember ops_161e5eb21805, here 161e5eb21805 a dynamic id, changes for every run, we use it for namespace in sql.
+
 ### 7. Run and verify the supplied workload
 
 Apply `60-metrics.yaml` and `61-logging.yaml`. Wait for Deployments `ops-metrics`, `loki` and `log-collector`. Apply `70-seller-job.yaml` to run the supplied processing program; no Python command needs to be assembled manually.
