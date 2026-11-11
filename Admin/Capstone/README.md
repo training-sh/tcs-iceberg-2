@@ -87,7 +87,7 @@ oc project olist-seller-ops
 this time no need for -n  olist-seller-ops 
 
 
-
+ 
 
 
 
@@ -413,6 +413,35 @@ oc -n olist-seller-ops port-forward service/spark-master 18080:8080
 Open `http://localhost:18080` in the VM browser, or inspect `curl -fsS http://localhost:18080/json/` from another terminal. Keep this forwarding session for the scaling check; restart it if it exits.
 
 **Check:** upload Job Complete, correct filenames, and one alive worker registered with the Spark master. Pod readiness and registered workers are different checks. Keep Trino stopped until publishing finishes.
+
+Note: you will see some exceptions, which you can skip, but look into last few lines
+
+
+command references
+
+```
+oc apply -f manifests/20-polaris-bootstrap.yaml
+oc -n olist-seller-ops wait --for=condition=Complete job/polaris-bootstrap --timeout=300s
+oc -n olist-seller-ops logs job/polaris-bootstrap
+oc apply -f manifests/21-polaris.yaml
+oc -n olist-seller-ops rollout status deployment/polaris --timeout=300s
+oc apply -f manifests/22-polaris-catalog.yaml
+
+oc -n olist-seller-ops wait --for=condition=Complete job/polaris-catalog --timeout=300s
+oc -n olist-seller-ops logs job/polaris-catalog
+```
+
+you may see exception in oc -n olist-seller-ops logs job/polaris-catalog command, but you need to look into last line
+that print job id
+
+```
+at org.apache.iceberg.rest.ErrorHandlers$DefaultErrorHandler.accept(ErrorHandlers.java:214)
+....
+at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+at java.base/java.lang.Thread.run(Thread.java:829)
+SELLER_COMPUTE_PASS {"run_id": "ops_161e5eb21805", "outputs": {"seller_activity": 3095, "seller_geography": 23}, "status": "COMPUTED", "seconds": 61.25, "input_items": 3379}
+```
 
 ### 7. Run and verify the supplied workload
 
