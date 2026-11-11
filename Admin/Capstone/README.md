@@ -8,6 +8,47 @@ https://github.com/training-sh/tcs-iceberg-2/blob/main/Admin/Capstone/manifests/
 
 
 
+If you want to stop all bigdata project pods to save memory/cpu
+
+```
+oc -n bigdata scale deployment,statefulset --all --replicas=0
+```
+
+
+For Port forward if you get error, I have setup a system service to help to port-forward two weeks back to help you.
+if you did not stop bigdata related pods, then port-forward may point to bigdata pods, not your olist-seller-ops  pods
+
+You may disable if you like
+```
+systemctl --user disable --now bigdata-uis.service
+```
+to enable 
+```
+systemctl --user enable  --now bigdata-uis.service
+```
+
+ 
+
+ensure to use namespace with oc
+```
+oc -n olist-seller-ops <<rest of your command>>
+```
+
+
+else on top of terminal
+
+this works per terminal
+
+```
+oc project olist-seller-ops
+```
+
+this time no need for -n  olist-seller-ops 
+
+
+
+
+
 
 # Olist Seller Operations Platform
 
