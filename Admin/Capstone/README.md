@@ -26,11 +26,33 @@ Below files are modified based on observation. If you already downloaded, you ma
 https://github.com/training-sh/tcs-iceberg-2/blob/main/Admin/Capstone/manifests/20-polaris-bootstrap.yaml
 
 
+# to increase/optimize ram
 
 If you want to stop all bigdata project pods to save memory/cpu
 
 ```
 oc -n bigdata scale deployment,statefulset --all --replicas=0
+```
+
+Stops the cluster—pause your hands-on work first
+```
+crc stop
+```
+
+Set RAM to 18 GiB (18432 MiB)
+
+```
+crc config set memory 18432
+```
+
+```
+crc start
+```
+
+Verify
+```
+crc config get memory
+crc status
 ```
 
 
