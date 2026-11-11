@@ -32,3 +32,26 @@ check space again
 ```
 df -h
 ```
+
+
+```
+# Remove old journal archives, keeping approximately 256 MB
+sudo journalctl --rotate
+sudo journalctl --vacuum-size=256M
+
+# Clear downloaded APT packages
+sudo apt-get clean
+
+# Remove revisions confirmed as disabled on this VM
+sudo snap remove core22 --revision=2955
+sudo snap remove firefox --revision=9137
+sudo snap remove gnome-46-2404 --revision=164
+sudo snap remove snap-store --revision=1447
+
+# Remove cached Snap downloads
+sudo find /var/lib/snapd/cache -maxdepth 1 -type f -delete
+
+# Check remaining space
+df -h /
+sudo journalctl --disk-usage
+```
