@@ -1,5 +1,24 @@
 # IMPORTANT
 
+
+
+for seaweed fs port forward for capstone project
+
+
+For seaweedfs
+
+```
+oc -n olist-seller-ops port-forward service/seaweedfs 23646:23646
+```
+
+http://localhost:23646 
+
+
+create directory called spark-events inside warehouse bucket
+
+
+
+
 Below files are modified based on observation. If you already downloaded, you may get this file again
 
 1. Patched to allow insecure storage type,
