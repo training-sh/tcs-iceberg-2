@@ -41,7 +41,10 @@ spec:
               name: lab-credentials
               key: polaris-bootstrap-credentials
         - name: JAVA_TOOL_OPTIONS
-          value: -XX:ActiveProcessorCount=1
+          value: >-
+            -Dpolaris.features."ALLOW_INSECURE_STORAGE_TYPES"=true
+            -Dpolaris.readiness.ignore-severe-issues=true
+            -XX:ActiveProcessorCount=1
         resources:
           requests:
             cpu: 50m
