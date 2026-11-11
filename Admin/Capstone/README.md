@@ -1,3 +1,14 @@
+# IMPORTANT
+
+Below files are modified based on observation. If you already downloaded, you may get this file again
+
+1. Patched to allow insecure storage type,
+
+https://github.com/training-sh/tcs-iceberg-2/blob/main/Admin/Capstone/manifests/20-polaris-bootstrap.yaml
+
+
+
+
 # Olist Seller Operations Platform
 
 > **Guidance note:** The directions and hints are provided for information, to clarify expectations and help save time. They are not intended to prescribe a single approach or influence your solution choices. Use your own judgment and explain your decisions while meeting the required outcomes.
