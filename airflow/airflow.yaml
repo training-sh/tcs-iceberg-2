@@ -1,0 +1,215 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: airflow-runner
+  namespace: bigdata
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: airflow-pipeline-runner
+  namespace: bigdata
+rules:
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  - pods/log
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: airflow-pipeline-runner
+  namespace: bigdata
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: airflow-pipeline-runner
+subjects:
+- kind: ServiceAccount
+  name: airflow-runner
+  namespace: bigdata
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow
+  namespace: bigdata
+spec:
+  selector:
+    app: airflow
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: airflow
+  namespace: bigdata
+spec:
+  serviceName: airflow
+  replicas: 0
+  selector:
+    matchLabels:
+      app: airflow
+  template:
+    metadata:
+      labels:
+        app: airflow
+    spec:
+      serviceAccountName: airflow-runner
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 0
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: airflow
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/airflow@sha256:b60d767aa3ca68e4792ff48666cd379a895b2b1cfd17ee0345c258f14e4def57
+        securityContext: &id001
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        args:
+        - bash
+        - -ec
+        - exec airflow standalone
+        env: &id002
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: database-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: database-password
+        - name: AIRFLOW_HOME
+          value: /opt/airflow
+        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+          value: postgresql+psycopg2://$(DB_USER):$(DB_PASSWORD)@postgres:5432/airflow_metadata
+        - name: AIRFLOW__CORE__EXECUTOR
+          value: LocalExecutor
+        - name: AIRFLOW__CORE__LOAD_EXAMPLES
+          value: 'false'
+        - name: AIRFLOW__CORE__PARALLELISM
+          value: '1'
+        - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
+          value: '1'
+        - name: AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS
+          value: team:admin
+        - name: AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE
+          value: /opt/airflow/auth/passwords.json
+        - name: AIRFLOW__CORE__EXECUTION_API_SERVER_URL
+          value: http://airflow:8080/execution/
+        - name: AIRFLOW__API__BASE_URL
+          value: http://127.0.0.1:28080
+        - name: AIRFLOW__API__WORKERS
+          value: '1'
+        - name: AIRFLOW__DAG_PROCESSOR__PARSING_PROCESSES
+          value: '1'
+        - name: AIRFLOW__API_AUTH__JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: airflow-e2e-auth
+              key: jwt-secret
+        - name: AIRFLOW__CORE__FERNET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: airflow-e2e-auth
+              key: fernet-key
+        ports:
+        - name: http
+          containerPort: 8080
+        volumeMounts:
+        - name: data
+          mountPath: /opt/airflow
+        - name: code
+          mountPath: /opt/airflow/dags/migration_dag.py
+          subPath: migration_dag.py
+          readOnly: true
+        - name: code
+          mountPath: /opt/course
+          readOnly: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: '2'
+            memory: 3Gi
+        startupProbe:
+          httpGet:
+            path: /api/v2/monitor/health
+            port: http
+          periodSeconds: 10
+          failureThreshold: 90
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /api/v2/monitor/health
+            port: http
+          periodSeconds: 10
+          timeoutSeconds: 5
+      initContainers:
+      - name: initialize
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/airflow@sha256:b60d767aa3ca68e4792ff48666cd379a895b2b1cfd17ee0345c258f14e4def57
+        securityContext: *id001
+        args:
+        - bash
+        - -ec
+        - mkdir -p /opt/airflow/auth /opt/airflow/dags; cp /seed/passwords.json /opt/airflow/auth/passwords.json;
+          chmod 600 /opt/airflow/auth/passwords.json; exec airflow db migrate
+        env: *id002
+        volumeMounts:
+        - name: data
+          mountPath: /opt/airflow
+        - name: auth
+          mountPath: /seed
+          readOnly: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            cpu: '1'
+            memory: 1Gi
+      volumes:
+      - name: code
+        configMap:
+          name: training-e2e-code
+      - name: auth
+        secret:
+          secretName: airflow-e2e-auth
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: crc-csi-hostpath-provisioner
