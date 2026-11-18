@@ -1,0 +1,59 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: app-developer
+  namespace: rbac-demo
+rules:
+- apiGroups: [""]
+  resources: [namespaces]
+  resourceNames: [rbac-demo]
+  verbs: [get]
+- apiGroups: [project.openshift.io]
+  resources: [projects]
+  resourceNames: [rbac-demo]
+  verbs: [get]
+- apiGroups: [""]
+  resources: [pods, services, configmaps]
+  verbs: [get, list, watch, create, update, patch, delete]
+- apiGroups: [""]
+  resources: [pods/log, events]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [pods/exec]
+  verbs: [get, create]
+- apiGroups: [apps]
+  resources: [deployments, deployments/scale, replicasets]
+  verbs: [get, list, watch, create, update, patch, delete]
+- apiGroups: [route.openshift.io]
+  resources: [routes]
+  verbs: [get, list, watch, create, update, patch, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: app-operator
+  namespace: rbac-demo
+rules:
+- apiGroups: [""]
+  resources: [namespaces]
+  resourceNames: [rbac-demo]
+  verbs: [get]
+- apiGroups: [project.openshift.io]
+  resources: [projects]
+  resourceNames: [rbac-demo]
+  verbs: [get]
+- apiGroups: [""]
+  resources: [pods, pods/log, services, endpoints, configmaps, events]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [pods]
+  verbs: [delete]
+- apiGroups: [apps]
+  resources: [deployments, deployments/scale, replicasets, statefulsets, daemonsets]
+  verbs: [get, list, watch]
+- apiGroups: [batch]
+  resources: [jobs, cronjobs]
+  verbs: [get, list, watch]
+- apiGroups: [route.openshift.io]
+  resources: [routes]
+  verbs: [get, list, watch]

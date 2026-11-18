@@ -1,0 +1,29 @@
+{
+  "tested_at": "2026-11-17T07:05:36.009935+00:00",
+  "oauth_spec_restored_exactly": true,
+  "namespace_absent": true,
+  "htpasswd_secret_absent": true,
+  "lab_users_absent": true,
+  "lab_identities_absent": true,
+  "new_logins_rejected": {
+    "admin": true,
+    "dev": true,
+    "ops": true
+  },
+  "remaining_lab_oauthaccesstokens": 0,
+  "remaining_lab_oauthauthorizetokens": 0,
+  "remaining_lab_oauthclientauthorizations": 0,
+  "authentication_conditions": {
+    "Degraded": "False",
+    "Progressing": "False",
+    "Available": "True",
+    "Upgradeable": "True",
+    "EvaluationConditionsDetected": "Unknown"
+  },
+  "okd_version": "4.22.0-okd-scos.10",
+  "private_state_removed": true,
+  "remote_validation_directory_removed": true,
+  "pre_existing_users_preserved": true,
+  "pre_existing_workloads_count": 25,
+  "pre_existing_ready_workloads": 25
+}

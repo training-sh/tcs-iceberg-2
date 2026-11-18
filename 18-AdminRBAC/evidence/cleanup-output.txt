@@ -1,0 +1,2 @@
+Removed lab provider, Secret, namespace, roles/bindings, users, identities and tokens: {"oauthaccesstokens": 0, "oauthauthorizetokens": 0, "oauthclientauthorizations": 0}
+RBAC_CLEANUP_PASS. Local htpasswd hashes and test kubeconfigs removed.

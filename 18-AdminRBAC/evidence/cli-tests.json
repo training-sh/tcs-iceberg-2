@@ -1,0 +1,60 @@
+{
+  "users": {
+    "admin": {
+      "login": "admin",
+      "checks": {
+        "get pods rbac-demo": true,
+        "get pods/log rbac-demo": true,
+        "create configmaps rbac-demo": true,
+        "patch deployments.apps rbac-demo": true,
+        "delete pods rbac-demo": true,
+        "create pods/exec rbac-demo": true,
+        "get secrets rbac-demo": true,
+        "create roles.rbac.authorization.k8s.io rbac-demo": true,
+        "list pods bigdata": false,
+        "get nodes None": false,
+        "create projectrequests (inherited cluster policy)": true
+      },
+      "actual_project_and_namespace_reads": true,
+      "actual_configmap_create": true
+    },
+    "dev": {
+      "login": "dev",
+      "checks": {
+        "get pods rbac-demo": true,
+        "get pods/log rbac-demo": true,
+        "create configmaps rbac-demo": true,
+        "patch deployments.apps rbac-demo": true,
+        "delete pods rbac-demo": true,
+        "create pods/exec rbac-demo": true,
+        "get secrets rbac-demo": false,
+        "create roles.rbac.authorization.k8s.io rbac-demo": false,
+        "list pods bigdata": false,
+        "get nodes None": false,
+        "create projectrequests (inherited cluster policy)": true
+      },
+      "actual_project_and_namespace_reads": true,
+      "actual_configmap_create": true
+    },
+    "ops": {
+      "login": "ops",
+      "checks": {
+        "get pods rbac-demo": true,
+        "get pods/log rbac-demo": true,
+        "create configmaps rbac-demo": false,
+        "patch deployments.apps rbac-demo": false,
+        "delete pods rbac-demo": true,
+        "create pods/exec rbac-demo": false,
+        "get secrets rbac-demo": false,
+        "create roles.rbac.authorization.k8s.io rbac-demo": false,
+        "list pods bigdata": false,
+        "get nodes None": false,
+        "create projectrequests (inherited cluster policy)": true
+      },
+      "actual_project_and_namespace_reads": true,
+      "actual_configmap_create": false
+    }
+  },
+  "note": "These are real password-authenticated tokens, not impersonation.",
+  "ops_deleted_pod_and_deployment_recovered": true
+}

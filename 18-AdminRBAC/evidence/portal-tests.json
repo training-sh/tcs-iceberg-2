@@ -1,0 +1,27 @@
+{
+  "tested_at": "2026-11-17T06:59:51.773130+00:00",
+  "method": "Browser form login with independent cookie contexts",
+  "users": {
+    "admin": {
+      "portal_login": "PASS",
+      "authenticated_user": "admin",
+      "project_pods_http_status": 200,
+      "cluster_nodes_http_status": 403,
+      "screenshot": "admin-portal.png"
+    },
+    "dev": {
+      "portal_login": "PASS",
+      "authenticated_user": "dev",
+      "project_pods_http_status": 200,
+      "cluster_nodes_http_status": 403,
+      "screenshot": "dev-portal.png"
+    },
+    "ops": {
+      "portal_login": "PASS",
+      "authenticated_user": "ops",
+      "project_pods_http_status": 200,
+      "cluster_nodes_http_status": 403,
+      "screenshot": "ops-portal.png"
+    }
+  }
+}
