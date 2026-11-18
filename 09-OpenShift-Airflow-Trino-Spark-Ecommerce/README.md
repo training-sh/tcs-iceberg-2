@@ -36,6 +36,13 @@ minutes for the regular discovery cycle.
 The DAG creates and seeds its own data. You can use this walkthrough on a fresh
 course cluster with the lab services already running.
 
+port forward
+
+```
+oc port-forward -n bigdata svc/airflow 28080:8080 --address=127.0.0.1
+```
+
+
 | Airflow task | What to show students |
 |---|---|
 | `seed_mysql` | Creates the MySQL database and four tables, then inserts the fixed fixture. |
