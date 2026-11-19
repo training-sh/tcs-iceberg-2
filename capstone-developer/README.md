@@ -6,6 +6,8 @@ Allow approximately **10 hours** with a working training cluster and completed A
 
 ### instructions here only for guidelines, you have options to follow your own way
 
+## Hadoop/Hive can be optional only if we have resource constraints
+
 [Part 1 work steps](#work-to-complete) | [Part 2](#part-2-automate-your-product-and-customer-analytics) | [Assessment](#assessment) | [Submission](#submission)
 
 ## Part 1 — Deploy and verify the supplied platform
