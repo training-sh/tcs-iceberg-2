@@ -28,6 +28,7 @@ sudo apt-get autoremove --purge -y
 ```
 
 
+# Do not follow below commands until instructed
 
 To clean up crc storage space
 
