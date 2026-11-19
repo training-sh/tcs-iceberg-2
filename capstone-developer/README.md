@@ -4,6 +4,8 @@ Allow approximately **10 hours** with a working training cluster and completed A
 
 # Ensure to stop bigdata pods/resources for your capstone
 
+# If **olist-seller-ops** namespace already present, you can delete that
+
 ### instructions here only for guidelines, you have options to follow your own way
 
 ## Hadoop/Hive can be optional only if we have resource constraints
