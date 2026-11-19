@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ops-metrics
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: ops-metrics
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ops-metrics
+  namespace: olist-seller-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ops-metrics
+  template:
+    metadata:
+      labels:
+        app: ops-metrics
+    spec:
+      serviceAccountName: olist-workloads
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: ops-metrics
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-spark@sha256:9a7752bfdaacb6886abdbdbcf4aafd3830dad75e8385e0281882e1916cc2ed8a
+        command:
+        - python3
+        args:
+        - /app/telemetry.py
+        ports:
+        - name: http
+          containerPort: 8000
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+        volumeMounts:
+        - name: code
+          mountPath: /app
+        - name: state
+          mountPath: /state
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      volumes:
+      - name: code
+        configMap:
+          name: seller-code
+      - name: state
+        emptyDir: {}

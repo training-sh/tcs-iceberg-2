@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seller-verify
+  namespace: olist-seller-ops
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: seller-verify
+    spec:
+      serviceAccountName: olist-workloads
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: verify-results
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-spark@sha256:9a7752bfdaacb6886abdbdbcf4aafd3830dad75e8385e0281882e1916cc2ed8a
+        args:
+        - /app/verify_results.py
+        env:
+        - name: RUN_ID
+          value: REPLACE_RUN_ID
+        envFrom:
+        - configMapRef:
+            name: seller-settings
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: '1'
+            memory: 256Mi
+        volumeMounts:
+        - name: code
+          mountPath: /app
+        - name: work
+          mountPath: /data
+        - name: input
+          mountPath: /input
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        command:
+        - python3
+      volumes:
+      - name: code
+        configMap:
+          name: seller-code
+      - name: work
+        emptyDir: {}
+      - name: input
+        projected:
+          sources:
+          - configMap:
+              name: seller-input-main
+          - configMap:
+              name: seller-input-orders

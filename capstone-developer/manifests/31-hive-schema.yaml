@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hive-schema
+  namespace: olist-seller-ops
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      enableServiceLinks: false
+      serviceAccountName: olist-workloads
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: schema
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-hive@sha256:cb0049f62c44177e2f663fd9b3e6d832536f822a7cea11b95af79870f8c56301
+        args:
+        - schema
+        - -initOrUpgradeSchema
+        env:
+        - name: HIVE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: password
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            cpu: '1'
+            memory: 1Gi
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - name: hive-local
+          mountPath: /tmp/hive-local
+        - name: hive-logs
+          mountPath: /tmp/hive-logs
+      automountServiceAccountToken: false
+      volumes:
+      - name: hive-local
+        emptyDir: {}
+      - name: hive-logs
+        emptyDir: {}

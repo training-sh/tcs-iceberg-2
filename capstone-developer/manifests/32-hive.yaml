@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hive-metastore
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: hive-metastore
+  ports:
+  - name: thrift
+    port: 9083
+    targetPort: thrift
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hive-metastore
+  namespace: olist-seller-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hive-metastore
+  template:
+    metadata:
+      labels:
+        app: hive-metastore
+    spec:
+      enableServiceLinks: false
+      serviceAccountName: olist-workloads
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: hive-metastore
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-hive@sha256:cb0049f62c44177e2f663fd9b3e6d832536f822a7cea11b95af79870f8c56301
+        args:
+        - metastore
+        - --hiveconf
+        - hive.metastore.event.db.notification.api.auth=false
+        env:
+        - name: HIVE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: password
+        - name: HADOOP_HEAPSIZE
+          value: '256'
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-secret-key
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        ports:
+        - name: thrift
+          containerPort: 9083
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: '1'
+            memory: 896Mi
+        startupProbe:
+          tcpSocket:
+            port: thrift
+          periodSeconds: 10
+          failureThreshold: 90
+        readinessProbe:
+          tcpSocket:
+            port: thrift
+          periodSeconds: 10
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - name: hive-local
+          mountPath: /tmp/hive-local
+        - name: hive-logs
+          mountPath: /tmp/hive-logs
+      automountServiceAccountToken: false
+      volumes:
+      - name: hive-local
+        emptyDir: {}
+      - name: hive-logs
+        emptyDir: {}
+  strategy:
+    type: Recreate
+    rollingUpdate: null
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hiveserver2
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: hiveserver2
+  ports:
+  - name: thrift
+    port: 10000
+    targetPort: thrift
+  - name: web
+    port: 10002
+    targetPort: web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hiveserver2
+  namespace: olist-seller-ops
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: hiveserver2
+  template:
+    metadata:
+      labels:
+        app: hiveserver2
+    spec:
+      enableServiceLinks: false
+      serviceAccountName: olist-workloads
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: hiveserver2
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-hive@sha256:cb0049f62c44177e2f663fd9b3e6d832536f822a7cea11b95af79870f8c56301
+        args:
+        - server2
+        env:
+        - name: HIVE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: password
+        - name: HADOOP_HEAPSIZE
+          value: '256'
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-secret-key
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        ports:
+        - name: thrift
+          containerPort: 10000
+        - name: web
+          containerPort: 10002
+        resources:
+          requests:
+            cpu: 25m
+            memory: 128Mi
+          limits:
+            cpu: '2'
+            memory: 1280Mi
+        startupProbe:
+          tcpSocket:
+            port: thrift
+          periodSeconds: 10
+          failureThreshold: 90
+        readinessProbe:
+          tcpSocket:
+            port: thrift
+          periodSeconds: 10
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - name: hive-local
+          mountPath: /tmp/hive-local
+        - name: hive-logs
+          mountPath: /tmp/hive-logs
+      automountServiceAccountToken: false
+      volumes:
+      - name: hive-local
+        emptyDir: {}
+      - name: hive-logs
+        emptyDir: {}
+  strategy:
+    type: Recreate
+    rollingUpdate: null

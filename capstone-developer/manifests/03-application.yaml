@@ -1,0 +1,213 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seller-settings
+  namespace: olist-seller-ops
+data:
+  S3_ENDPOINT: http://seaweedfs:8333
+  TRINO_URL: http://trino:8080
+  HDFS_URI: hdfs://namenode:9000
+  HADOOP_USER_NAME: team
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seller-code
+  namespace: olist-seller-ops
+data:
+  seller_ops.py: "\"\"\"Read Olist inputs, calculate seller operations, publish both\
+    \ catalogs and verify them.\"\"\"\nimport csv\nimport json\nimport os\nimport\
+    \ re\nimport socket\nimport time\nimport uuid\nfrom collections import Counter,\
+    \ defaultdict\nfrom decimal import Decimal\nfrom pathlib import Path\nfrom pyspark.sql\
+    \ import SparkSession, functions as F\n\n\nFILES = {'sellers':'olist_sellers_dataset.csv','items':'olist_order_items_dataset.csv','orders':'olist_orders_dataset.csv'}\n\
+    \nREQUIRED = {'sellers':{'seller_id','seller_state'}, 'items':{'order_id','order_item_id','seller_id','price','shipping_limit_date'},\
+    \ 'orders':{'order_id','order_status','order_delivered_carrier_date'}}\n\ndef\
+    \ load(root):\n    data = {}\n    for key,name in FILES.items():\n        with\
+    \ (Path(root)/name).open(encoding='utf-8-sig',newline='') as f:\n            reader\
+    \ = csv.DictReader(f)\n            if not REQUIRED[key] <= set(reader.fieldnames\
+    \ or []): raise ValueError('Missing columns: '+name)\n            data[key] =\
+    \ list(reader)\n    return data\n\ndef calculate(data):\n    sellers = {r['seller_id']:r\
+    \ for r in data['sellers']}\n    orders = {r['order_id']:r for r in data['orders']}\n\
+    \    assert len(sellers)==len(data['sellers']) and len(orders)==len(data['orders']),\
+    \ 'Duplicate primary key'\n    assert len({(r['order_id'],r['order_item_id'])\
+    \ for r in data['items']})==len(data['items'])\n    groups = defaultdict(list)\n\
+    \    for r in data['items']:\n        assert r['seller_id'] in sellers and r['order_id']\
+    \ in orders, 'Orphan item'\n        assert r['shipping_limit_date'], 'Missing\
+    \ shipping deadline'\n        groups[r['seller_id']].append(r)\n    activity =\
+    \ []\n    for sid,seller in sorted(sellers.items()):\n        items = groups[sid]\n\
+    \        statuses = Counter(orders[oid]['order_status'] for oid in {x['order_id']\
+    \ for x in items})\n        shipping = Counter()\n        for item in items:\n\
+    \            stamp = orders[item['order_id']]['order_delivered_carrier_date']\n\
+    \            shipping['missing_handoff_items' if not stamp else 'on_time_items'\
+    \ if stamp <= item['shipping_limit_date'] else 'late_items'] += 1\n        activity.append(dict(seller_id=sid,seller_state=seller['seller_state'],distinct_orders=sum(statuses.values()),item_rows=len(items),\n\
+    \            merchandise_value=format(sum((Decimal(x['price']) for x in items),Decimal('0')),'.2f'),\n\
+    \            delivered_orders=statuses['delivered'],canceled_orders=statuses['canceled'],\n\
+    \            other_orders=sum(v for k,v in statuses.items() if k not in ('delivered','canceled')),\n\
+    \            **{k:shipping[k] for k in ('on_time_items','late_items','missing_handoff_items')}))\n\
+    \    geography = []\n    for state in sorted({r['seller_state'] for r in activity}):\n\
+    \        rows = [r for r in activity if r['seller_state']==state]\n        geography.append(dict(seller_state=state,seller_count=len(rows),item_rows=sum(r['item_rows']\
+    \ for r in rows)))\n    return {'seller_activity':activity,'seller_geography':geography}\n\
+    \ndef transform(sellers,items,orders):\n    joined=items.join(orders,'order_id').withColumn('money',F.col('price').cast('decimal(18,2)'))\n\
+    \    stamp=F.to_timestamp('order_delivered_carrier_date'); deadline=F.to_timestamp('shipping_limit_date')\n\
+    \    joined=joined.withColumn('handoff',F.when(stamp.isNull(),'missing').when(stamp<=deadline,'on_time').otherwise('late'))\n\
+    \    agg=joined.groupBy('seller_id').agg(F.countDistinct('order_id').alias('distinct_orders'),F.count('*').alias('item_rows'),F.sum('money').alias('merchandise_value'),\n\
+    \        *[F.countDistinct(F.when(F.col('order_status')==status,F.col('order_id'))).alias(status+'_orders')\
+    \ for status in ('delivered','canceled')],\n        F.countDistinct(F.when(~F.col('order_status').isin('delivered','canceled'),F.col('order_id'))).alias('other_orders'),\n\
+    \        *[F.sum(F.when(F.col('handoff')==status,1).otherwise(0)).alias(col) for\
+    \ status,col in [('on_time','on_time_items'),('late','late_items'),('missing','missing_handoff_items')]])\n\
+    \    activity=sellers.select('seller_id','seller_state').join(agg,'seller_id','left').fillna(0)\n\
+    \    geography=activity.groupBy('seller_state').agg(F.count('*').alias('seller_count'),F.sum('item_rows').alias('item_rows'))\n\
+    \    return {'seller_activity':activity,'seller_geography':geography}\n\ndef execute():\n\
+    \    started=time.monotonic(); run=os.environ.get('RUN_ID','ops_'+uuid.uuid4().hex[:12])\n\
+    \    if not re.fullmatch(r'ops_[a-z0-9_]{1,45}',run): raise ValueError('Use a\
+    \ fresh lowercase ops_ run ID')\n    b=(SparkSession.builder.appName('olist-'+run).master('spark://spark-master:7077')\n\
+    \       .config('spark.driver.host',os.environ.get('POD_IP',socket.gethostbyname(socket.gethostname())))\n\
+    \       .config('spark.driver.bindAddress','0.0.0.0').config('spark.cores.max','1')\n\
+    \       .config('spark.executor.cores','1').config('spark.executor.memory','512m')\n\
+    \       .config('spark.sql.shuffle.partitions','2').config('spark.sql.session.timeZone','UTC')\n\
+    \       .config('spark.hadoop.fs.s3a.threads.max','4').config('spark.hadoop.fs.s3a.connection.maximum','16')\n\
+    \       .config('spark.redaction.regex','(?i)secret|password|token|credential|access.?key')\n\
+    \       .config('spark.hadoop.hive.metastore.uris','thrift://hive-metastore:9083')\n\
+    \       .config('spark.sql.warehouse.dir','hdfs://namenode:9000/user/hive/warehouse')\n\
+    \       .config('spark.sql.catalog.polaris','org.apache.iceberg.spark.SparkCatalog')\n\
+    \       .config('spark.sql.catalog.polaris.type','rest')\n       .config('spark.sql.catalog.polaris.uri','http://polaris:8181/api/catalog')\n\
+    \       .config('spark.sql.catalog.polaris.warehouse','training')\n       .config('spark.sql.catalog.polaris.credential',os.environ['POLARIS_CLIENT_ID']+':'+os.environ['POLARIS_CLIENT_SECRET'])\n\
+    \       .config('spark.sql.catalog.polaris.scope','PRINCIPAL_ROLE:ALL')\n    \
+    \   .config('spark.sql.catalog.polaris.oauth2-server-uri','http://polaris:8181/api/catalog/v1/oauth/tokens')\n\
+    \       .config('spark.sql.catalog.polaris.io-impl','org.apache.iceberg.aws.s3.S3FileIO')\n\
+    \       .config('spark.sql.catalog.polaris.s3.endpoint',os.environ['S3_ENDPOINT'])\n\
+    \       .config('spark.sql.catalog.polaris.s3.path-style-access','true')\n   \
+    \    .config('spark.sql.catalog.polaris.s3.access-key-id',os.environ['AWS_ACCESS_KEY_ID'])\n\
+    \       .config('spark.sql.catalog.polaris.s3.secret-access-key',os.environ['AWS_SECRET_ACCESS_KEY'])\n\
+    \       .config('spark.sql.catalog.polaris.client.region','us-east-1'))\n    spark=b.enableHiveSupport().getOrCreate();\
+    \ spark.sparkContext.setLogLevel('WARN')\n    try:\n        jvm=spark._jvm\n \
+    \       fs=jvm.org.apache.hadoop.fs.FileSystem.get(jvm.java.net.URI('s3a://warehouse'),spark._jsc.hadoopConfiguration())\n\
+    \        Path('/tmp/input').mkdir(exist_ok=True)\n        for name in ('olist_sellers_dataset.csv','olist_order_items_dataset.csv','olist_orders_dataset.csv'):\n\
+    \            fs.copyToLocalFile(False,jvm.org.apache.hadoop.fs.Path('s3a://warehouse/olist/input/'+name),jvm.org.apache.hadoop.fs.Path('/tmp/input/'+name),True)\n\
+    \        expected=calculate(load('/tmp/input'))\n        frames={}\n        for\
+    \ key,filename in [('sellers','olist_sellers_dataset.csv'),('items','olist_order_items_dataset.csv'),('orders','olist_orders_dataset.csv')]:\n\
+    \            frame=spark.read.option('header',True).option('mode','FAILFAST').csv('s3a://warehouse/olist/input/'+filename)\n\
+    \            if not REQUIRED[key]<=set(frame.columns): raise ValueError('Missing\
+    \ columns: '+key)\n            frames[key]=frame; print('INPUT_COUNT '+key+'='+str(frame.count()),flush=True)\n\
+    \        sellers,items,orders=(frames[k] for k in ('sellers','items','orders'))\n\
+    \        outputs=transform(sellers,items,orders)\n        spark.sql(f\"CREATE\
+    \ DATABASE {run} LOCATION 'hdfs://namenode:9000/olist/{run}'\")\n        spark.sql(f'CREATE\
+    \ NAMESPACE polaris.{run}')\n        result={'run_id':run,'outputs':{}}\n    \
+    \    for name,frame in outputs.items():\n            actual=[]\n            for\
+    \ row in frame.collect():\n                d=row.asDict()\n                if\
+    \ 'merchandise_value' in d: d['merchandise_value']=format(d['merchandise_value'],'.2f')\n\
+    \                actual.append(d)\n            key='seller_id' if name=='seller_activity'\
+    \ else 'seller_state'\n            assert sorted(actual,key=lambda r:r[key])==expected[name],\
+    \ 'Spark/reference mismatch: '+name\n            frame.coalesce(1).write.mode('error').format('parquet').saveAsTable(f'{run}.{name}')\n\
+    \            frame.coalesce(1).writeTo(f'polaris.{run}.{name}').using('iceberg').create()\n\
+    \            result['outputs'][name]=len(actual); print('OUTPUT_VERIFIED '+name+'='+str(len(actual)),flush=True)\n\
+    \        result.update(status='COMPUTED',seconds=round(time.monotonic()-started,2),input_items=items.count())\n\
+    \        spark.createDataFrame([(result['seconds'],result['input_items'])],'compute_seconds\
+    \ double, input_items long').writeTo(f'polaris.{run}.processing_metrics').using('iceberg').create()\n\
+    \        body=json.dumps(result)\n        stream=fs.create(jvm.org.apache.hadoop.fs.Path('s3a://warehouse/olist/reports/'+run+'.json'),False)\n\
+    \        try: stream.write(bytearray(body.encode()))\n        finally: stream.close()\n\
+    \        print('SELLER_COMPUTE_PASS '+body,flush=True)\n    finally: spark.stop()\n\
+    \nif __name__=='__main__': execute()\n"
+  verify_results.py: "\"\"\"Check both catalogs against the supplied Olist bytes and\
+    \ publish the final run status.\"\"\"\nimport csv\nimport json\nimport os\nimport\
+    \ re\nimport time\nfrom collections import Counter, defaultdict\nfrom decimal\
+    \ import Decimal\nfrom pathlib import Path\nimport requests\n\ndef expected_results():\n\
+    \    def read(name):\n        with (Path('/input')/name).open(encoding='utf-8',newline='')\
+    \ as f:return list(csv.DictReader(f))\n    sellers=read('olist_sellers_dataset.csv')\n\
+    \    orders={r['order_id']:r for r in read('olist_orders_dataset.csv')}\n    grouped=defaultdict(list)\n\
+    \    for item in read('olist_order_items_dataset.csv'):grouped[item['seller_id']].append(item)\n\
+    \    activity=[]\n    for seller in sellers:\n        sid=seller['seller_id'];items=grouped[sid]\n\
+    \        statuses=Counter(orders[oid]['order_status'] for oid in {r['order_id']\
+    \ for r in items})\n        shipping=Counter()\n        for item in items:\n \
+    \           stamp=orders[item['order_id']]['order_delivered_carrier_date']\n \
+    \           shipping['missing_handoff_items' if not stamp else 'on_time_items'\
+    \ if stamp<=item['shipping_limit_date'] else 'late_items']+=1\n        activity.append(dict(seller_id=sid,seller_state=seller['seller_state'],distinct_orders=sum(statuses.values()),item_rows=len(items),\n\
+    \            merchandise_value=format(sum((Decimal(r['price']) for r in items),Decimal('0')),'.2f'),\n\
+    \            delivered_orders=statuses['delivered'],canceled_orders=statuses['canceled'],other_orders=sum(v\
+    \ for k,v in statuses.items() if k not in ('delivered','canceled')),\n       \
+    \     **{k:shipping[k] for k in ('on_time_items','late_items','missing_handoff_items')}))\n\
+    \    geography=[]\n    for state in sorted({r['seller_state'] for r in activity}):\n\
+    \        rows=[r for r in activity if r['seller_state']==state]\n        geography.append(dict(seller_state=state,seller_count=len(rows),item_rows=sum(r['item_rows']\
+    \ for r in rows)))\n    return {'seller_activity':activity,'seller_geography':geography}\n\
+    \ndef query(sql):\n    r=requests.post(os.environ.get('TRINO_URL','http://trino:8080')+'/v1/statement',data=sql.encode(),headers={'X-Trino-User':'team'},timeout=30)\n\
+    \    rows=[];deadline=time.monotonic()+300\n    while True:\n        r.raise_for_status();page=r.json()\n\
+    \        if 'error' in page:raise RuntimeError(page['error']['message'])\n   \
+    \     rows.extend(page.get('data',[]))\n        if 'nextUri' not in page:return\
+    \ rows\n        if time.monotonic()>deadline:\n            requests.delete(page['nextUri'],timeout=10);raise\
+    \ TimeoutError('Trino query timed out')\n        r=requests.get(page['nextUri'],timeout=30)\n\
+    \ndef main():\n    run=os.environ['RUN_ID']\n    if not re.fullmatch(r'ops_[a-z0-9_]{1,45}',run):raise\
+    \ ValueError('Set RUN_ID to the successful compute run ID')\n    started=time.monotonic();result={'run_id':run,'outputs':{}}\n\
+    \    for name,expected in expected_results().items():\n        key='seller_id'\
+    \ if name=='seller_activity' else 'seller_state'\n        columns=sorted(expected[0]);sqlcols=','.join(columns)\n\
+    \        wanted=[[r[c] for c in columns] for r in sorted(expected,key=lambda r:r[key])]\n\
+    \        hive=query(f'SELECT {sqlcols} FROM hive.{run}.{name} ORDER BY {key}')\n\
+    \        iceberg=query(f'SELECT {sqlcols} FROM iceberg_polaris.{run}.{name} ORDER\
+    \ BY {key}')\n        assert hive==iceberg==wanted,'Catalog/oracle mismatch: '+name\n\
+    \        result['outputs'][name]=len(wanted);print('TRINO_VERIFIED '+name+'='+str(len(wanted)),flush=True)\n\
+    \    seconds,items=query(f'SELECT compute_seconds,input_items FROM iceberg_polaris.{run}.processing_metrics')[0]\n\
+    \    result.update(status='PASS',seconds=round(float(seconds)+time.monotonic()-started,2),input_items=int(items))\n\
+    \    query(f\"CREATE TABLE iceberg_polaris.{run}.verification AS SELECT 'PASS'\
+    \ AS status, {int(items)} AS input_items, {result['seconds']} AS processing_seconds\"\
+    )\n    requests.post('http://ops-metrics:8000/report',json=result,timeout=15).raise_for_status()\n\
+    \    print('SELLER_OPS_PASS '+json.dumps(result),flush=True)\n\nif __name__=='__main__':main()\n"
+  seed.py: "\"\"\"Supplied storage preparation program; no pip install or student\
+    \ development.\"\"\"\nfrom pathlib import Path\nfrom pyspark.sql import SparkSession\n\
+    spark=SparkSession.builder.master('local[1]').appName('olist-input-upload').config('spark.eventLog.enabled','false').getOrCreate()\n\
+    try:\n    j=spark._jvm\n    fs=j.org.apache.hadoop.fs.FileSystem.get(j.java.net.URI('s3a://warehouse'),spark._jsc.hadoopConfiguration())\n\
+    \    fs.mkdirs(j.org.apache.hadoop.fs.Path('s3a://warehouse/spark-events'))\n\
+    \    for p in sorted(Path('/input').glob('*.csv')):\n        # Projected ConfigMap\
+    \ files are symlinks; stream their bytes rather than\n        # invoking S3A's\
+    \ local-file relative-path copier on those symlinks.\n        output=fs.create(j.org.apache.hadoop.fs.Path('s3a://warehouse/olist/input/'+p.name),True)\n\
+    \        try: output.write(bytearray(p.read_bytes()))\n        finally: output.close()\n\
+    \        print('INPUT_UPLOADED '+p.name,flush=True)\nfinally: spark.stop()\n"
+  configure_catalog.py: "\"\"\"Supplied Polaris catalog initialization, executed by\
+    \ its manifest Job.\"\"\"\nimport os,requests\nBASE='http://polaris:8181'\nr=requests.post(BASE+'/api/catalog/v1/oauth/tokens',headers={'Polaris-Realm':'POLARIS'},data={'grant_type':'client_credentials','client_id':os.environ['POLARIS_CLIENT_ID'],'client_secret':os.environ['POLARIS_CLIENT_SECRET'],'scope':'PRINCIPAL_ROLE:ALL'},timeout=30)\n\
+    r.raise_for_status();headers={'Polaris-Realm':'POLARIS','Authorization':'Bearer\
+    \ '+r.json()['access_token']}\ncatalog={'name':'training','type':'INTERNAL','properties':{'default-base-location':'s3://warehouse/iceberg'},'storageConfigInfo':{'storageType':'S3','allowedLocations':['s3://warehouse/iceberg'],'region':'us-east-1','endpoint':'http://seaweedfs:8333','endpointInternal':'http://seaweedfs:8333','pathStyleAccess':True,'stsUnavailable':True}}\n\
+    r=requests.get(BASE+'/api/management/v1/catalogs/training',headers=headers,timeout=30)\n\
+    if r.status_code==404:\n    r=requests.post(BASE+'/api/management/v1/catalogs',headers=headers,json={'catalog':catalog},timeout=30)\n\
+    r.raise_for_status()\nprint('POLARIS_CATALOG_READY training s3://warehouse/iceberg',flush=True)\n"
+  telemetry.py: "\"\"\"Small supplied job metrics endpoint; reports also persist independently\
+    \ in S3.\"\"\"\nfrom http.server import BaseHTTPRequestHandler,HTTPServer\nimport\
+    \ json,os,time,urllib.request\nfrom pathlib import Path\nSTATE=Path('/state/report.json')\n\
+    class Handler(BaseHTTPRequestHandler):\n    def do_POST(self):\n        if self.path!='/report':\
+    \ self.send_error(404); return\n        data=json.loads(self.rfile.read(int(self.headers['Content-Length'])))\n\
+    \        if data.get('status')!='PASS': self.send_error(400); return\n       \
+    \ STATE.write_text(json.dumps(data))\n        payload={'streams':[{'stream':{'app':'seller-ops','namespace':os.environ['POD_NAMESPACE']},'values':[[str(time.time_ns()),'SELLER_OPS_PASS\
+    \ '+json.dumps(data)]]}]}\n        try:\n            req=urllib.request.Request('http://loki:3100/loki/api/v1/push',json.dumps(payload).encode(),{'Content-Type':'application/json'})\n\
+    \            urllib.request.urlopen(req,timeout=10).close()\n        except Exception:\
+    \ print('LOKI_DELIVERY_FAILED: inspect Loki readiness; report is retained in S3',flush=True)\n\
+    \        self.send_response(200); self.end_headers(); self.wfile.write(b'accepted')\n\
+    \    def do_GET(self):\n        data=json.loads(STATE.read_text()) if STATE.exists()\
+    \ else {}\n        if self.path=='/metrics':\n            body='olist_job_success\
+    \ %d\\nolist_job_duration_seconds %s\\nolist_input_items %s\\n'%(int(data.get('status')=='PASS'),data.get('seconds',0),data.get('input_items',0))\n\
+    \            for table,count in data.get('outputs',{}).items(): body+='olist_output_rows{table=\"\
+    %s\"} %d\\n'%(table,count)\n            self.send_response(200); self.send_header('Content-Type','text/plain;\
+    \ version=0.0.4'); self.end_headers(); self.wfile.write(body.encode())\n     \
+    \   else:\n            self.send_response(200); self.end_headers(); self.wfile.write(json.dumps(data).encode())\n\
+    HTTPServer(('0.0.0.0',8000),Handler).serve_forever()\n"
+  collect_logs.py: "\"\"\"Namespace-only pod log collection with per-container timestamp\
+    \ checkpoints.\"\"\"\nimport json,os,ssl,time,urllib.request\nfrom urllib.parse\
+    \ import urlencode\nfrom pathlib import Path\nBASE='https://kubernetes.default.svc'\n\
+    TOKEN=Path('/var/run/secrets/kubernetes.io/serviceaccount/token')\nCTX=ssl.create_default_context(cafile='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt')\n\
+    NS=os.environ['POD_NAMESPACE']; positions={}\ndef get(path):\n    req=urllib.request.Request(BASE+path,headers={'Authorization':'Bearer\
+    \ '+TOKEN.read_text().strip()})\n    return urllib.request.urlopen(req,context=CTX,timeout=15).read()\n\
+    while True:\n    try:\n        pods=json.loads(get('/api/v1/namespaces/'+NS+'/pods'))['items']\n\
+    \        streams=[]\n        for pod in pods:\n            name=pod['metadata']['name']\n\
+    \            if name.startswith(('log-collector','loki','prometheus','grafana')):\
+    \ continue\n            for container in pod['spec']['containers']:\n        \
+    \        key=(pod['metadata']['uid'],container['name']); checkpoint=positions.get(key)\n\
+    \                params={'container':container['name'],'timestamps':'true','tailLines':'300'}\n\
+    \                if checkpoint: params['sinceTime']=checkpoint\n             \
+    \   else: params['sinceSeconds']='120'\n                try: lines=get('/api/v1/namespaces/'+NS+'/pods/'+name+'/log?'+urlencode(params)).decode(errors='replace').splitlines()\n\
+    \                except Exception: continue\n                values=[]; newest=checkpoint\n\
+    \                for line in lines:\n                    stamp,_,message=line.partition('\
+    \ ')\n                    if checkpoint and stamp<=checkpoint: continue\n    \
+    \                values.append([str(time.time_ns()),message]); newest=stamp\n\
+    \                if values: streams.append({'stream':{'namespace':NS,'pod':name,'container':container['name']},'values':values})\n\
+    \                if newest: positions[key]=newest\n        if streams:\n     \
+    \       req=urllib.request.Request('http://loki:3100/loki/api/v1/push',json.dumps({'streams':streams}).encode(),{'Content-Type':'application/json'})\n\
+    \            urllib.request.urlopen(req,timeout=15).close()\n    except Exception:\n\
+    \        # Re-read a small overlap after delivery failure; duplicates are preferable\
+    \ to silent loss.\n        positions.clear(); print('LOG_COLLECTION_RETRY',flush=True)\n\
+    \    time.sleep(15)\n"

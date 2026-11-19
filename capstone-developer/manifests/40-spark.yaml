@@ -1,0 +1,234 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-master
+  namespace: olist-seller-ops
+spec:
+  selector:
+    app: spark-master
+  ports:
+  - name: master
+    port: 7077
+    targetPort: master
+  - name: master-ui
+    port: 8080
+    targetPort: master-ui
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spark-master
+  namespace: olist-seller-ops
+spec:
+  serviceName: spark-master
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-master
+  template:
+    metadata:
+      labels:
+        app: spark-master
+    spec:
+      enableServiceLinks: false
+      serviceAccountName: olist-workloads
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: spark-master
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-spark@sha256:9a7752bfdaacb6886abdbdbcf4aafd3830dad75e8385e0281882e1916cc2ed8a
+        args:
+        - master
+        ports:
+        - name: master
+          containerPort: 7077
+        - name: master-ui
+          containerPort: 8080
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: HDFS_URI
+          value: file:///
+        - name: EXTERNAL_HDFS_URI
+          value: hdfs://namenode.olist-seller-ops.svc.cluster.local:9000
+        - name: S3_ENDPOINT
+          value: http://seaweedfs:8333
+        - name: POLARIS_URI
+          value: http://polaris:8181/api/catalog
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-secret-key
+        - name: POLARIS_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-client-id
+        - name: POLARIS_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-client-secret
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        - name: SPARK_DAEMON_MEMORY
+          value: 128m
+        resources:
+          requests:
+            cpu: 100m
+            memory: 384Mi
+          limits:
+            cpu: '1'
+            memory: 1Gi
+        startupProbe:
+          tcpSocket:
+            port: master-ui
+          periodSeconds: 10
+          failureThreshold: 60
+        readinessProbe:
+          tcpSocket:
+            port: master-ui
+          periodSeconds: 10
+        volumeMounts:
+        - name: work
+          mountPath: /data
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+      volumes:
+      - name: work
+        emptyDir: {}
+      automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-worker
+  namespace: olist-seller-ops
+spec:
+  clusterIP: None
+  selector:
+    app: spark-worker
+  ports:
+  - name: worker-ui
+    port: 8081
+    targetPort: worker-ui
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-worker
+  namespace: olist-seller-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-worker
+  template:
+    metadata:
+      labels:
+        app: spark-worker
+    spec:
+      enableServiceLinks: false
+      serviceAccountName: olist-workloads
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: spark-worker
+        image: image-registry.openshift-image-registry.svc:5000/bigdata/dataeng-spark@sha256:9a7752bfdaacb6886abdbdbcf4aafd3830dad75e8385e0281882e1916cc2ed8a
+        args:
+        - worker
+        ports:
+        - name: worker-ui
+          containerPort: 8081
+        env:
+        - name: SPARK_WORKER_CORES
+          value: '1'
+        - name: SPARK_WORKER_MEMORY
+          value: 1g
+        - name: HDFS_URI
+          value: file:///
+        - name: EXTERNAL_HDFS_URI
+          value: hdfs://namenode.olist-seller-ops.svc.cluster.local:9000
+        - name: S3_ENDPOINT
+          value: http://seaweedfs:8333
+        - name: POLARIS_URI
+          value: http://polaris:8181/api/catalog
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: s3-secret-key
+        - name: POLARIS_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-client-id
+        - name: POLARIS_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lab-credentials
+              key: polaris-client-secret
+        - name: JAVA_TOOL_OPTIONS
+          value: -XX:ActiveProcessorCount=1
+        - name: SPARK_DAEMON_MEMORY
+          value: 128m
+        - name: SPARK_WORKER_DIR
+          value: /data/spark-work
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: '2'
+            memory: 2Gi
+        startupProbe:
+          tcpSocket:
+            port: worker-ui
+          periodSeconds: 10
+          failureThreshold: 60
+        readinessProbe:
+          tcpSocket:
+            port: worker-ui
+          periodSeconds: 10
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - name: work
+          mountPath: /data
+      automountServiceAccountToken: false
+      volumes:
+      - name: work
+        emptyDir: {}
+  strategy:
+    type: Recreate
