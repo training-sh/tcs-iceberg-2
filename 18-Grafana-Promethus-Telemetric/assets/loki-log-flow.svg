@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 630" width="1440" height="630" role="img" aria-label="How application logs reach Loki">
+<rect x="0" y="0" width="1440" height="630" rx="0" fill="#0e192d" stroke="none" stroke-width="2"/>
+<rect x="48" y="47" width="50" height="5" rx="2" fill="#64dfed" stroke="none" stroke-width="2"/>
+<text x="48" y="111" fill="#f6faff" font-size="49" font-weight="700" font-family="Segoe UI, Arial, sans-serif">How application logs reach Loki</text>
+<text x="48" y="151" fill="#b7c8df" font-size="24" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Follow container output from Spark and Trino to a log search in Grafana.</text>
+<text x="48" y="216" fill="#64dfed" font-size="20" font-weight="700" font-family="Segoe UI, Arial, sans-serif">COLLECT</text>
+<rect x="48" y="232" width="307" height="108" rx="13" fill="#192942" stroke="#3d5270" stroke-width="2"/>
+<rect x="63" y="253" width="4" height="23" rx="2" fill="#64dfed" stroke="none" stroke-width="2"/>
+<text x="75" y="274" fill="#f6faff" font-size="19" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Container output</text>
+<text x="75" y="308" fill="#c4d2e5" font-size="14" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Applications write to stdout and stderr</text>
+<text x="361" y="297" fill="#64dfed" font-size="27" font-weight="700" font-family="Segoe UI, Arial, sans-serif">→</text>
+<rect x="393" y="232" width="307" height="108" rx="13" fill="#192942" stroke="#3d5270" stroke-width="2"/>
+<rect x="408" y="253" width="4" height="23" rx="2" fill="#64dfed" stroke="none" stroke-width="2"/>
+<text x="420" y="274" fill="#f6faff" font-size="19" font-weight="700" font-family="Segoe UI, Arial, sans-serif">OpenShift pod log API</text>
+<text x="420" y="308" fill="#c4d2e5" font-size="14" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Exposes container logs</text>
+<text x="706" y="297" fill="#64dfed" font-size="27" font-weight="700" font-family="Segoe UI, Arial, sans-serif">→</text>
+<rect x="738" y="232" width="307" height="108" rx="13" fill="#192942" stroke="#3d5270" stroke-width="2"/>
+<rect x="753" y="253" width="4" height="23" rx="2" fill="#64dfed" stroke="none" stroke-width="2"/>
+<text x="765" y="274" fill="#f6faff" font-size="19" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Grafana Alloy</text>
+<text x="765" y="308" fill="#c4d2e5" font-size="14" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Discovers pods and labels entries</text>
+<text x="1051" y="297" fill="#64dfed" font-size="27" font-weight="700" font-family="Segoe UI, Arial, sans-serif">→</text>
+<rect x="1083" y="232" width="307" height="108" rx="13" fill="#192942" stroke="#3d5270" stroke-width="2"/>
+<rect x="1098" y="253" width="4" height="23" rx="2" fill="#64dfed" stroke="none" stroke-width="2"/>
+<text x="1110" y="274" fill="#f6faff" font-size="19" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Loki</text>
+<text x="1110" y="308" fill="#c4d2e5" font-size="14" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Stores logs and indexes stream labels</text>
+<text x="48" y="385" fill="#bdb1ff" font-size="20" font-weight="700" font-family="Segoe UI, Arial, sans-serif">SEARCH</text>
+<rect x="48" y="401" width="422" height="108" rx="13" fill="#192942" stroke="#3d5270" stroke-width="2"/>
+<rect x="63" y="422" width="4" height="23" rx="2" fill="#bdb1ff" stroke="none" stroke-width="2"/>
+<text x="75" y="443" fill="#f6faff" font-size="19" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Grafana Explore</text>
+<text x="75" y="477" fill="#c4d2e5" font-size="14" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Select Loki and set a time range</text>
+<text x="476" y="466" fill="#bdb1ff" font-size="27" font-weight="700" font-family="Segoe UI, Arial, sans-serif">→</text>
+<rect x="508" y="401" width="422" height="108" rx="13" fill="#192942" stroke="#3d5270" stroke-width="2"/>
+<rect x="523" y="422" width="4" height="23" rx="2" fill="#bdb1ff" stroke="none" stroke-width="2"/>
+<text x="535" y="443" fill="#f6faff" font-size="19" font-weight="700" font-family="Segoe UI, Arial, sans-serif">LogQL</text>
+<text x="535" y="477" fill="#c4d2e5" font-size="14" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Select streams and filter text</text>
+<text x="936" y="466" fill="#bdb1ff" font-size="27" font-weight="700" font-family="Segoe UI, Arial, sans-serif">→</text>
+<rect x="968" y="401" width="422" height="108" rx="13" fill="#192942" stroke="#3d5270" stroke-width="2"/>
+<rect x="983" y="422" width="4" height="23" rx="2" fill="#bdb1ff" stroke="none" stroke-width="2"/>
+<text x="995" y="443" fill="#f6faff" font-size="19" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Matching entries</text>
+<text x="995" y="477" fill="#c4d2e5" font-size="14" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Inspect timestamps and stream labels</text>
+<rect x="48" y="548" width="1344" height="51" rx="11" fill="#172640" stroke="none" stroke-width="2"/>
+<text x="67" y="581" fill="#d8e6f7" font-size="21" font-weight="400" font-family="Segoe UI, Arial, sans-serif">Alloy adds namespace, pod and container labels. Loki is configured for 24-hour retention.</text>
+</svg>
