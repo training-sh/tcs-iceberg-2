@@ -64,3 +64,15 @@ crictl rmi --prune
 crictl images --digests | grep community-operator-index
 ```
 
+use with care
+
+```
+findmnt -T /var/lib/containers/storage -o TARGET,SOURCE,FSTYPE
+lsblk -D
+```
+
+```
+mountpoint=$(findmnt -n -o TARGET -T /var/lib/containers/storage)
+sudo fstrim -v "$mountpoint"
+```
+
