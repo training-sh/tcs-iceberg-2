@@ -10,6 +10,30 @@ Allow approximately **10 hours** with a working training cluster and completed A
 
 ## Hadoop/Hive can be optional only if we have resource constraints
 
+
+To stop Big data pods/components
+
+-- before stopping , know all the pods/replicas 
+
+```
+oc -n bigdata get deployment,statefulset,pods,job,cronjob,daemonset
+```
+```
+oc -n bigdata get deployment,statefulset \
+  -o custom-columns=KIND:.kind,NAME:.metadata.name,REPLICAS:.spec.replicas \
+  > bigdata-replicas-before-stop.txt
+```
+
+this will stop all components in bigdata
+```
+oc -n bigdata scale deployment,statefulset --all --replicas=0
+```
+
+```
+oc -n bigdata get pods -w
+```
+
+
 [Part 1 work steps](#work-to-complete) | [Part 2](#part-2-automate-your-product-and-customer-analytics) | [Assessment](#assessment) | [Submission](#submission)
 
 ## Part 1 — Deploy and verify the supplied platform
